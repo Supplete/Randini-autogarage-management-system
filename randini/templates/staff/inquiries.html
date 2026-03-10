@@ -1,0 +1,213 @@
+{% extends 'staff/admin_base.html' %}
+{% load static %}
+
+{% block title %}Staff Inbox | Randini Garage{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --maroon: #800000;
+        --gold: #FFD700;
+        --light-gray: #f8f9fa;
+    }
+
+    .inquiry-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .inquiry-card {
+        border: none;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border-left: 6px solid #dee2e6; /* Default for read */
+    }
+
+    .inquiry-card.unread-status {
+        border-left: 6px solid var(--maroon);
+        background-color: #fffafb;
+    }
+
+    .inquiry-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .meta-box {
+        background: var(--light-gray);
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin: 10px 0;
+        color: #555;
+    }
+
+    .message-content {
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        line-height: 1.6;
+        color: #333;
+        margin: 15px 0;
+    }
+
+    .action-col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+        border-left: 1px solid #eee;
+        padding-left: 25px;
+    }
+
+    /* Custom Buttons */
+    .btn-custom {
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        border: none;
+        transition: 0.2s;
+    }
+
+    .btn-reply-custom { background: var(--maroon); color: white; }
+    .btn-reply-custom:hover { background: #600000; color: white; }
+
+    .btn-copy-custom { background: #e9ecef; color: #495057; }
+    .btn-copy-custom:hover { background: #dee2e6; }
+
+    .btn-read-custom { background: #d4edda; color: #155724; }
+    .btn-read-custom:hover { background: #c3e6cb; }
+
+    .btn-delete-custom { 
+        color: #dc3545; 
+        font-size: 0.85rem; 
+        background: none; 
+        border: none;
+        margin-top: 5px;
+    }
+    .btn-delete-custom:hover { color: #a71d2a; text-decoration: underline; }
+
+    .unread-badge {
+        background: var(--maroon);
+        color: white;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="inquiry-container py-4">
+    <div class="page-header">
+        <div>
+            <h2 style="color: var(--maroon); font-weight: 800; margin:0;">STAFF INBOX</h2>
+            <p class="text-muted mb-0 small">Manage customer questions and garage feedback</p>
+        </div>
+        <span class="badge" style="background: var(--maroon); color: white; padding: 12px 25px; font-size: 1rem; border-radius: 30px;">
+            <i class="fas fa-inbox me-2"></i>{{ inquiries|length }} Total Messages
+        </span>
+    </div>
+
+    {% for msg in inquiries %}
+    <div class="card inquiry-card {% if not msg.is_read %}unread-status{% else %}read-status{% endif %}">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <h4 style="color: var(--maroon); font-weight: 800; margin:0;">{{ msg.subject }}</h4>
+                        {% if not msg.is_read %}
+                            <span class="unread-badge">New</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="meta-box">
+                        <span><i class="fas fa-user me-1 text-maroon"></i> <strong>{{ msg.name }}</strong></span>
+                        <span class="mx-3 text-muted">|</span>
+                        <span><i class="fas fa-envelope me-1 text-maroon"></i> {{ msg.email }}</span>
+                        <span class="mx-3 text-muted">|</span>
+                        <span><i class="fas fa-phone me-1 text-maroon"></i> {{ msg.phone }}</span>
+                    </div>
+
+                    <div class="message-content shadow-sm">
+                        {{ msg.message }}
+                    </div>
+
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-calendar-alt me-1"></i> {{ msg.created_at|date:"D, M d, Y" }} 
+                        <i class="fas fa-clock ms-3 me-1"></i> {{ msg.created_at|date:"H:i" }}
+                    </p>
+                </div>
+
+                <div class="col-md-3 action-col">
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ msg.email }}&su=Re: {{ msg.subject|urlencode }}&body=Hello {{ msg.name|urlencode }}," 
+                       target="_blank" 
+                       class="btn-custom btn-reply-custom">
+                       <i class="fas fa-paper-plane me-2"></i>Compose Reply
+                    </a>
+
+                    <button class="btn-custom btn-copy-custom" onclick="copyEmail('{{ msg.email }}')">
+                        <i class="fas fa-copy me-2"></i>Copy Email
+                    </button>
+
+                    {% if not msg.is_read %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="msg_id" value="{{ msg.id }}">
+                        <button type="submit" name="mark_read" class="btn-custom btn-read-custom">
+                            <i class="fas fa-check-double me-2"></i>Mark as Read
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <form method="POST" onsubmit="return confirm('Permanently delete this message?')">
+                        {% csrf_token %}
+                        <input type="hidden" name="msg_id" value="{{ msg.id }}">
+                        <button type="submit" name="delete" class="btn-delete-custom w-100 text-center">
+                            <i class="fas fa-trash-alt me-1"></i>Delete Conversation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+        <i class="fas fa-envelope-open text-muted mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
+        <h3 class="text-muted">No messages found.</h3>
+        <p class="text-muted">When customers use the contact form, their messages will appear here.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function copyEmail(email) {
+    navigator.clipboard.writeText(email).then(() => {
+        // Simple Toast or Alert
+        alert("Email copied to clipboard!");
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Customer Detail | Admin{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Customer Profile</h2>
+    <a href="{% url 'admin_customers' %}" class="btn btn-outline-maroon fw-bold">Back to Customers</a>
+</div>
+
+<div class="row g-4">
+
+    <!-- PROFILE CARD -->
+    <div class="col-md-4">
+        <div class="card shadow-sm p-4 text-center">
+            <img src="{% static 'images/user-placeholder.png' %}" 
+                 class="img-fluid rounded-circle mb-3" alt="Customer Photo">
+            <h4 class="fw-bold">John Doe</h4>
+            <p class="text-muted">john@example.com</p>
+            <p class="text-muted">0711962088</p>
+            <p class="text-muted">Joined: 2024-12-15</p>
+            <button class="btn btn-warning w-100 fw-bold mt-2">Edit Customer</button>
+        </div>
+    </div>
+
+    <!-- RECENT ORDERS / REPAIRS -->
+    <div class="col-md-8">
+        <div class="card shadow-sm p-4">
+            <h5 class="fw-bold mb-3">Recent Bookings / Repairs</h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="bg-maroon text-white">
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#101</td>
+                            <td>Toyota Corolla</td>
+                            <td>Engine Repair</td>
+                            <td>2025-01-10</td>
+                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#102</td>
+                            <td>Honda Civic</td>
+                            <td>Brake Replacement</td>
+                            <td>2024-12-20</td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
+                        <!-- Add more dummy rows if needed -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

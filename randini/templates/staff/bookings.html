@@ -1,0 +1,126 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Bookings Management | Randini Garage{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --maroon: #800000;
+        --charcoal: #333333;
+    }
+    .card-header-custom {
+        background-color: var(--maroon);
+        color: white;
+        border-top-left-radius: 15px !important;
+        border-top-right-radius: 15px !important;
+    }
+    .expense-input {
+        width: 100px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 2px 8px;
+        font-weight: bold;
+    }
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: center;
+        border: none;
+        transition: 0.3s;
+    }
+    .btn-pending { background-color: #fff3cd; color: #856404; }
+    .btn-active { background-color: #cce5ff; color: #004085; }
+    .btn-done { background-color: #d4edda; color: #155724; }
+    
+    .status-badge:hover { filter: brightness(0.9); cursor: pointer; }
+    
+    .btn-email { background-color: #6c757d; color: white; }
+    .btn-email:hover { background-color: #5a6268; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg border-0" style="border-radius: 15px;">
+                <div class="card-header card-header-custom py-3 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold"><i class="fas fa-tools me-2"></i>CLIENT SERVICE MANAGEMENT</h4>
+                    <span class="badge bg-light text-dark p-2">Total Revenue: Ksh {{ total_revenue }}</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr class="text-secondary small text-uppercase">
+                                    <th class="ps-4">Customer & Vehicle</th>
+                                    <th>Service Details</th>
+                                    <th>Expenses (KSH)</th>
+                                    <th class="text-center">Work Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in bookings %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <h6 class="mb-0 fw-bold" style="color: var(--charcoal);">{{ b.full_name }}</h6>
+                                        <small class="text-muted"><i class="fas fa-car me-1"></i>{{ b.vehicle_type }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-outline-secondary border text-dark">{{ b.service_type }}</span>
+                                    </td>
+                                    <td>
+                                        <form method="POST" class="d-flex flex-column gap-2 py-2">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="booking_id" value="{{ b.id }}">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">Ksh</span>
+                                                <input type="number" name="price" class="form-control fw-bold" value="{{ b.price }}">
+                                            </div>
+                                    </td>
+                                    <td style="width: 160px;">
+                                            <button type="submit" name="set_pending" class="status-badge btn-pending">Pending Quote</button>
+                                            <button type="submit" name="set_inprogress" class="status-badge btn-active">In Progress</button>
+                                            <button type="submit" name="set_completed" class="status-badge btn-done">Mark Done</button>
+                                        </form>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group gap-1">
+                                            <form method="POST"> {% csrf_token %}
+                                                <input type="hidden" name="booking_id" value="{{ b.id }}">
+                                                <button type="submit" name="send_email" class="btn btn-email btn-sm shadow-sm">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                            </form>
+                                            
+                                            <a href="{% url 'print_receipt' b.id %}" target="_blank" class="btn btn-dark btn-sm shadow-sm">
+                                                <i class="fas fa-print"></i>
+                                            </a>
+
+                                            <form method="POST" onsubmit="return confirm('Delete this booking?');"> {% csrf_token %}
+                                                <input type="hidden" name="booking_id" value="{{ b.id }}">
+                                                <button type="submit" name="delete_booking" class="btn btn-outline-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">No garage bookings found today.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

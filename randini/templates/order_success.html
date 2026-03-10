@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Success | Randini Auto Garage{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="text-center mb-4">
+                    <div class="display-1 text-success mb-3">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <h2 class="fw-bold">Payment Received!</h2>
+                    <p class="text-muted">Thank you for choosing Randini Auto Garage. Your order is being processed.</p>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+                    <div class="bg-maroon p-3 text-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">RECEIPT: #{{ order.id }}</span>
+                        <span>{{ order.created_at|date:"d M Y, H:i" }}</span>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <h6 class="text-muted text-uppercase small fw-bold">Billed To:</h6>
+                                <p class="mb-0 fw-bold">{{ order.full_name }}</p>
+                                <p class="mb-0 small text-muted">{{ order.phone }}</p>
+                                <p class="mb-0 small text-muted">{{ order.address }}, {{ order.city }}</p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <h6 class="text-muted text-uppercase small fw-bold">Payment Status:</h6>
+                                <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                                    {{ order.payment_status|upper }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-sm border-top">
+                                <thead>
+                                    <tr class="text-muted small">
+                                        <th>ITEM</th>
+                                        <th class="text-center">QTY</th>
+                                        <th class="text-end">PRICE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.items.all %}
+                                    <tr>
+                                        <td class="fw-semibold text-dark">{{ item.part.name }}</td>
+                                        <td class="text-center">{{ item.quantity }}</td>
+                                        <td class="text-end">KSh {{ item.price }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="border-top">
+                                        <td colspan="2" class="fw-bold pt-3">TOTAL PAID</td>
+                                        <td class="text-end fw-bold pt-3 fs-5" style="color: var(--maroon);">
+                                            KSh {{ order.total_amount }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white p-3 text-center border-0">
+                        <p class="small text-muted mb-0">A confirmation email has been sent to <strong>{{ order.email }}</strong></p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center no-print">
+                    <button onclick="window.print()" class="btn btn-outline-dark px-4">
+                        <i class="bi bi-printer me-2"></i>Print Receipt
+                    </button>
+                    <a href="{% url 'home' %}" class="btn btn-warning px-4 fw-bold">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    @media print {
+        .no-print, .navbar, footer { display: none !important; }
+        .card { border: 1px solid #ddd !important; box-shadow: none !important; }
+        .bg-maroon { background-color: #800000 !important; -webkit-print-color-adjust: exact; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,52 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Login | Randini Garage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+   </head>
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="brand">
+            <h1>Randini Garage</h1>
+            <span>STAFF PORTAL</span>
+        </div>
+
+        <div class="divider"></div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Staff username" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="login-btn">
+                LOGIN
+            </button>
+        </form>
+
+        <div class="footer-text">
+            © 2026 <span>Randini Garage</span> · Authorized Staff Only
+        </div>
+
+    </div>
+
+</body>
+</html>

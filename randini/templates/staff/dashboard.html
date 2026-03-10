@@ -1,0 +1,244 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Staff Dashboard | Randini Garage{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Staff Dashboard</h2>
+            <p class="text-muted mb-0">Management Overview for Randini Garage</p>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-dark p-2 mb-1">{{ today|date:"l, d M Y" }}</span>
+            <div class="small text-muted">Logged in as: <strong>{{ request.user.username }}</strong></div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-success border-5 h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase text-muted small fw-bold">Total Sales (Paid)</h6>
+                    <h2 class="fw-bold text-success mb-1">KES {{ total_sales|default:"0" }}</h2>
+                    <p class="text-muted mb-0 small"><i class="fa fa-check-circle"></i> From completed M-Pesa transactions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-primary border-5 h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase text-muted small fw-bold">Total Orders</h6>
+                    <h2 class="fw-bold text-primary mb-1">{{ orders_count|default:"0" }}</h2>
+                    <a href="{% url 'staff_orders' %}" class="btn btn-sm btn-link ps-0 text-decoration-none text-primary fw-bold">Manage Orders &rarr;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 border-start border-warning border-5 h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase text-muted small fw-bold">Pending Payments</h6>
+                    <h2 class="fw-bold text-warning mb-1">{{ pending_count|default:"0" }}</h2>
+                    <a href="{% url 'staff_orders' %}" class="btn btn-sm btn-warning rounded-pill px-3 py-0 small">Review Pending</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0"><i class="fa fa-chart-line text-success me-2"></i>Revenue Trend (Last 7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0"><i class="fa fa-tools text-primary me-2"></i>Service Mix</h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <div style="width: 100%; max-width: 250px;">
+                        <canvas id="serviceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="card shadow-sm text-center border-0 p-3 h-100">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-2 d-inline-block mx-auto mb-2">
+                            <i class="fa fa-calendar-check text-primary fs-4"></i>
+                        </div>
+                        <h6 class="small fw-bold text-muted">Bookings</h6>
+                        <h4 class="fw-bold mb-0">{{ bookings_count|default:"0" }}</h4>
+                        <a href="{% url 'staff_bookings' %}" class="stretched-link"></a>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card shadow-sm text-center border-0 p-3 h-100">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-2 d-inline-block mx-auto mb-2">
+                            <i class="fa fa-envelope text-warning fs-4"></i>
+                        </div>
+                        <h6 class="small fw-bold text-muted">Inquiries</h6>
+                        <h4 class="fw-bold mb-0">{{ inquiries_count|default:"0" }}</h4>
+                        <a href="{% url 'staff_inquiries' %}" class="stretched-link"></a>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-dark bg-opacity-10 p-2 rounded me-3">
+                                    <i class="fa fa-users text-dark"></i>
+                                </div>
+                                <div>
+                                    <h6 class="small fw-bold mb-0 text-muted">Total Customers</h6>
+                                    <h4 class="fw-bold mb-0">{{ customers_count|default:"0" }}</h4>
+                                </div>
+                            </div>
+                            <a href="{% url 'staff_customers' %}" class="btn btn-outline-dark btn-sm rounded-pill">View All</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 p-3 bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="small fw-bold mb-0">Inventory Status</h6>
+                                <p class="mb-0 small opacity-75">Update spare parts & stock</p>
+                            </div>
+                            <a href="{% url 'staff_inventory' %}" class="btn btn-light btn-sm rounded-pill text-primary fw-bold">Go to Stock</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fa fa-history text-muted me-2"></i>Recent Orders</h5>
+                    <a href="{% url 'staff_orders' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Full Report</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-3 border-0">Order ID</th>
+                                    <th class="border-0">Customer</th>
+                                    <th class="border-0">Total</th>
+                                    <th class="border-0">Status</th>
+                                    <th class="text-end pe-3 border-0">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td class="ps-3 fw-bold text-muted">#{{ order.id }}</td>
+                                    <td>{{ order.full_name }}</td>
+                                    <td class="fw-bold">KES {{ order.total_amount }}</td>
+                                    <td>
+                                        <span class="badge {% if order.status == 'Completed' %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
+                                            {{ order.status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <a href="{% url 'staff_orders' %}" class="btn btn-sm btn-light border">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="fa fa-folder-open d-block fs-2 mb-2 opacity-50"></i>
+                                        No recent orders found.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Global Chart Defaults
+    Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+    Chart.defaults.color = "#6c757d";
+
+    // 1. Revenue Trend Line Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }}, 
+            datasets: [{
+                label: 'Daily Revenue (KES)',
+                data: {{ chart_data|safe }},
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { borderDash: [5, 5] },
+                    ticks: { callback: value => 'KSh ' + value }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Service Mix Doughnut Chart
+    const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+    new Chart(serviceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ service_labels|safe }},
+            datasets: [{
+                data: {{ service_data|safe }},
+                backgroundColor: ['#0d6efd', '#ffc107', '#0dcaf0', '#212529', '#6610f2', '#fd7e14'],
+                hoverOffset: 10,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } }
+            },
+            cutout: '70%'
+        }
+    });
+</script>
+{% endblock %}

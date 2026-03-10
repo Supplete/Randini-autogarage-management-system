@@ -1,0 +1,9 @@
+{% extends 'staff/admin_base.html' %}
+{% block content %}
+<h2>Add Spare Part</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Add Spare Part</button>
+</form>
+{% endblock %}

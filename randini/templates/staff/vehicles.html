@@ -1,0 +1,52 @@
+{% extends 'staff/admin_base.html' %}
+
+{% block title %}Vehicles | Staff Portal{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">All Vehicles</h2>
+</div>
+
+<!-- Info message -->
+<div class="alert alert-info fw-bold">
+    Vehicles are added automatically when customers book a service.
+</div>
+
+<div class="card shadow-sm p-4">
+    <div class="table-responsive">
+        <table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Owner</th>
+            <th>Vehicle Model</th>
+            <th>Vehicle Plate</th>
+            <th>Service Type</th>
+            <th>Booking Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if bookings %}
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ booking.customer.first_name }} {{ booking.customer.last_name }}</td>
+                <td>{{ booking.vehicle.license_plate }}</td>
+                <td>{{ booking.repair.description }}</td>
+                <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6">No bookings found.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+    </div>
+</div>
+
+{% endblock %}

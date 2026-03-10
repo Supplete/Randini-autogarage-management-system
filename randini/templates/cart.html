@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cart | Randini Auto Garage{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="fw-bold text-center mb-4">Your Cart</h1>
+        <p class="text-center text-muted mb-5">Review your selected spare parts before checkout</p>
+
+        {% if cart_items %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Item</th>
+                        <th>Price (KSh)</th>
+                        <th>Quantity</th>
+                        <th>Total (KSh)</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                       <td>
+    {% if item.part.image %}
+        <img src="{{ item.part.image.url }}" 
+             alt="{{ item.part.name }}" 
+             class="img-fluid" style="width: 80px; height: 60px; object-fit: cover; border-radius: 5px;">
+    {% else %}
+        <img src="{% static 'images/no-image.png' %}" 
+             alt="No Image" 
+             class="img-fluid" style="width: 80px; height: 60px; object-fit: cover; border-radius: 5px;">
+    {% endif %}
+    <span class="ms-2">{{ item.part.name }}</span>
+</td>
+
+                        <td>KSh {{ item.part.price }}</td>
+                        <td>
+                            <a href="{% url 'decrease_cart' item.part.id %}" class="btn btn-sm btn-outline-danger">−</a>
+                            <span class="mx-2 fw-bold">{{ item.quantity }}</span>
+                            <a href="{% url 'increase_cart' item.part.id %}" class="btn btn-sm btn-outline-success">+</a>
+                        </td>
+                        <td>KSh {{ item.total }}</td>
+                        <td>
+                            <a href="{% url 'remove_from_cart' item.part.id %}" class="btn btn-sm btn-danger">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CART SUMMARY -->
+        <div class="d-flex justify-content-end mt-4">
+            <div class="card p-3 shadow" style="max-width: 350px;">
+                <h5 class="fw-bold">Cart Summary</h5>
+                <p class="mb-3 fw-bold">Subtotal: <span class="fw-bold text-warning">KSh {{ subtotal }}</span></p>
+                <a href="{% url 'checkout' %}" class="btn btn-warning w-100 fw-bold">Proceed to Checkout</a>
+            </div>
+        </div>
+
+        {% else %}
+        <p class="text-center text-muted">Your cart is empty.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

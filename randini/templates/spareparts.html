@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sparepart.css' %}">
+{% endblock %}
+
+<div class="spareparts-header">
+    <h1>Available Spare Parts</h1>
+    <p>Browse our quality parts and add them to your cart</p>
+</div>
+
+<div class="spareparts-container">
+    {% for part in parts %}
+    <div class="sparepart-card">
+
+        <div class="sparepart-image">
+            {% if part.image %}
+                <img src="{{ part.image.url }}" alt="{{ part.name }}">
+            {% else %}
+                <img src="{% static 'images/no-image.png' %}" alt="No Image">
+            {% endif %}
+        </div>
+
+        <h2>{{ part.name }}</h2>
+        <p><strong>Price:</strong> KES {{ part.price }}</p>
+        <p><strong>Stock:</strong> {{ part.stock }}</p>
+
+        <form action="{% url 'add_to_cart' part.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+        </form>
+    </div>
+    {% empty %}
+    <p class="empty-text">No spare parts available at the moment.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

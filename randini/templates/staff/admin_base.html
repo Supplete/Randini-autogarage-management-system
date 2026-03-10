@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel | Randini Auto Garage{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar bg-maroon text-white vh-100 position-fixed">
+        <div class="p-3">
+            <a href="{% url 'staff_dashboard' %}" class="d-block mb-4 fs-4 fw-bold text-warning text-decoration-none">
+                Randini Admin
+            </a>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2"><a href="{% url 'staff_dashboard' %}" class="nav-link text-white">Dashboard</a></li>
+                <li class="nav-item mb-2"><a href="{% url 'staff_customers' %}" class="nav-link text-white">Customers</a></li>
+             
+                <li class="nav-item mb-2"><a href="{% url 'staff_inventory' %}" class="nav-link text-white">Inventory</a></li>
+                <li class="nav-item mb-2">
+                <a href="{% url 'staff_orders' %}" class="nav-link text-white">
+                     Customer Orders
+                </a>
+            </li>
+                 <li class="nav-item mb-2"><a href="{% url 'staff_bookings' %}" class="nav-link text-white">Bookings</a></li>
+                 <li class="nav-item mb-2"><a href="{% url 'staff_inquiries' %}" class="nav-link text-white">Inquiries</a></li>
+                   <li class="nav-item mb-2"><a href="{% url 'staff_analytics' %}" class="nav-link text-white">Analytics</a></li>
+                <li class="nav-item mb-2"><a href="{% url 'staff_settings' %}" class="nav-link text-white">Settings</a></li>
+                
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-fill ms-sidebar">
+        <div class="container-fluid p-4">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

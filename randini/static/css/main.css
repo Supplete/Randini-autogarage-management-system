@@ -1,0 +1,149 @@
+/* ============================================================
+   1. VARIABLES & RESET
+   ============================================================ */
+:root {
+    --maroon: #800000;
+    --gold: #ffc107;
+    --gold-hover: #e0ac00;
+    --black: #0f0f0f;
+    --white: #ffffff;
+    --light-bg: #f9f9f9;
+    --radius: 10px; /* Locked at 10px per user request */
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-heavy: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+body {
+    background-color: var(--light-bg);
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   2. NAVIGATION
+   ============================================================ */
+.navbar {
+    padding: 0.5rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--gold) !important;
+}
+
+.user-pill {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+/* ============================================================
+   3. COMPONENTS (Radius Locking)
+   ============================================================ */
+.btn, 
+.card, 
+.dropdown-menu, 
+.form-control, 
+.auth-card, 
+.alert,
+.user-pill {
+    border-radius: var(--radius) !important;
+}
+
+/* Form Controls */
+.form-control {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+}
+
+.form-control:focus {
+    border-color: var(--maroon);
+    box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.15);
+}
+
+/* Buttons */
+.btn-warning {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: var(--maroon);
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background-color: var(--gold-hover);
+    border-color: var(--gold-hover);
+}
+
+.bg-maroon { background-color: var(--maroon) !important; }
+.text-maroon { color: var(--maroon) !important; }
+
+/* ============================================================
+   4. AUTHENTICATION UI
+   ============================================================ */
+.auth-container {
+    padding: 60px 0;
+    background: radial-gradient(circle at top right, #fff, #f1f1f1);
+}
+
+.auth-card {
+    background: white;
+    padding: 2.5rem;
+    border: none;
+    box-shadow: var(--shadow-heavy);
+    margin: 0 auto;
+}
+
+.password-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--maroon);
+    text-transform: uppercase;
+    z-index: 10;
+}
+
+/* ============================================================
+   5. STAFF & DATA TABLES
+   ============================================================ */
+.table {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--shadow);
+}
+
+.table thead {
+    background-color: #f8f9fa;
+    color: var(--maroon);
+}
+
+/* ============================================================
+   6. FOOTER
+   ============================================================ */
+footer {
+    padding: 1.5rem 0;
+    border-top: 3px solid var(--gold);
+}

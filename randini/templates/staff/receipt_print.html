@@ -1,0 +1,33 @@
+{% extends 'staff/admin_base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-none border p-4" id="printableReceipt" style="max-width: 600px; margin: auto;">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold">RANDINI AUTO GARAGE</h3>
+            <p class="small text-muted">Official Service Receipt</p>
+        </div>
+        <hr>
+        <div class="row mb-3">
+            <div class="col-6"><strong>Receipt #:</strong> {{ booking.id }}</div>
+            <div class="col-6 text-end"><strong>Date:</strong> {{ today|date:"d M Y" }}</div>
+        </div>
+        <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
+        <p><strong>Vehicle:</strong> {{ booking.car_reg }}</p>
+        <p><strong>Service:</strong> {{ booking.service_type }}</p>
+        <hr>
+        <h5 class="text-end fw-bold">Amount: KSh {{ booking.total_cost }}</h5>
+        
+        <div class="mt-5 text-center no-print">
+            <button onclick="window.print()" class="btn btn-dark btn-sm">Click to Print Receipt</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .no-print, .navbar, .sidebar { display: none !important; }
+        body { background: white; }
+        .card { border: none !important; }
+    }
+</style>
+{% endblock %}

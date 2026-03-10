@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}My Account | Randini Garage{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold">Welcome back, {{ request.user.first_name }}!</h2>
+            <p class="text-muted">Track your garage services and spare part orders below.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 fw-bold text-maroon"><i class="fas fa-tools me-2"></i>My Service History</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small">
+                                    <th class="ps-3">VEHICLE</th>
+                                    <th>SERVICE</th>
+                                    <th>STATUS</th>
+                                    <th class="pe-3">COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in bookings %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <span class="fw-bold">{{ b.vehicle_type }}</span>
+                                    </td>
+                                    <td>{{ b.service_type }}</td>
+                                    <td>
+                                        {% if b.status == 'Completed' %}
+                                            <span class="badge bg-success">Ready</span>
+                                        {% elif b.status == 'In Progress' %}
+                                            <span class="badge bg-primary">In Garage</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Queued</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-3 fw-bold">Ksh {{ b.price }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-4">No services booked yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 fw-bold text-maroon"><i class="fas fa-shopping-basket me-2"></i>Spare Part Orders</h5>
+                </div>
+                <div class="card-body">
+                    {% for order in orders %}
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                        <div>
+                            <h6 class="mb-0 fw-bold">Order #{{ order.id }}</h6>
+                            <small class="text-muted">{{ order.created_at|date:"d M, Y" }}</small>
+                        </div>
+                        <div class="text-end">
+                            <p class="mb-0 fw-bold text-success">Ksh {{ order.total_amount }}</p>
+                            <span class="badge {% if order.status == 'Completed' %}bg-success{% else %}bg-secondary{% endif %} pt-1">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-muted">No spare parts purchased yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'staff/admin_base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <h2 class="fw-bold">Business Analytics</h2>
+        <button onclick="window.print()" class="btn btn-dark">
+            <i class="bi bi-file-earmark-pdf me-2"></i>Export as PDF / Print
+        </a>
+    </div>
+
+    <div class="print-only text-center mb-5">
+        <h1 class="fw-bold">RANDINI AUTO GARAGE</h1>
+        <h4 class="text-uppercase border-bottom pb-2">Monthly Performance Report</h4>
+        <p>Generated on: {{ report_date|date:"F d, Y" }}</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-print-6">
+            <div class="card border shadow-sm p-3">
+                <h6 class="text-muted small">Total Revenue (All Time)</h6>
+                <h3 class="fw-bold text-success">KSh {{ total_revenue|floatformat:0 }}</h3>
+            </div>
+        </div>
+        <div class="col-md-6 col-print-6">
+            <div class="card border shadow-sm p-3">
+                <h6 class="text-muted small">Total Service Bookings</h6>
+                <h3 class="fw-bold text-primary">{{ total_bookings }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8 col-print-12">
+            <div class="card border shadow-sm p-4">
+                <h5 class="fw-bold mb-4">Daily Sales Trend</h5>
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4 col-print-12">
+            <div class="card border shadow-sm p-4">
+                <h5 class="fw-bold mb-4">Most Popular Parts</h5>
+                <canvas id="partsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 1. Hide print-only elements on the screen */
+    .print-only { display: none; }
+
+    @media print {
+        /* 2. Show print-only elements and hide UI buttons/nav */
+        .no-print, .btn, .navbar, .sidebar { display: none !important; }
+        .print-only { display: block !important; }
+        
+        /* 3. Force layout to fit on a sheet of A4 paper */
+        body { background: white !important; font-size: 12pt; }
+        .card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 20px; }
+        .col-print-6 { width: 50%; float: left; }
+        .col-print-12 { width: 100%; }
+        
+        /* 4. Ensure Charts show up in the print */
+        canvas { max-width: 100% !important; height: auto !important; }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ... (Your Chart.js code from the previous response) ...
+</script>
+{% endblock %}

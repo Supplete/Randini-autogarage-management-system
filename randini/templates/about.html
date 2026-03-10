@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us | Randini Auto Garage{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO SECTION ================= -->
+<section class="hero-section text-white py-5" style="background: linear-gradient(135deg, #800000, #0f0f0f);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="fw-bold display-5">
+                    <span style="color:#f6c000;">Meet Our Team</span><br>
+                    A Trusted Organization Since 2005
+                </h1>
+                <p class="lead mt-3">
+                    Skilled professionals dedicated to providing reliable auto care, genuine spare parts, and top-notch maintenance services.
+                </p>
+            </div>
+            <div class="col-md-6 text-center mt-4 mt-md-0">
+                <img src="{% static 'images/garage-team.jpeg' %}" class="img-fluid shadow rounded" alt="Garage Team">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= OUR MISSION ================= -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Our Mission</h2>
+            <p class="text-muted">To deliver top-quality auto services while building trust with every customer.</p>
+        </div>
+
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="card p-4 h-100 shadow-sm">
+                    <i class="bi bi-gear-fill fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold mb-2">Reliable Repairs</h5>
+                    <p>Expert mechanics ensure your car is back on the road safely and efficiently.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 h-100 shadow-sm">
+                    <i class="bi bi-tools fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold mb-2">Genuine Parts</h5>
+                    <p>We only use high-quality, authentic parts for long-lasting performance.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 h-100 shadow-sm">
+                    <i class="bi bi-person-check fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold mb-2">Trusted Service</h5>
+                    <p>Our friendly team delivers professional service and personalized care.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= OUR TEAM ================= -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Meet Our Team</h2>
+            <p class="text-muted">Skilled professionals dedicated to your vehicle’s care</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+
+            <!-- TEAM MEMBER 1 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm text-center p-3">
+                    <img src="{% static 'images/team1.jpg' %}" class="card-img-top rounded-circle mx-auto" alt="Team Member 1" style="width:120px;height:120px;object-fit:cover;">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-1">Martin Karandini</h5>
+                        <p class="text-warning mb-1">Head Mechanic</p>
+                        <p class="text-muted small">10+ years experience in auto repair and diagnostics.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEAM MEMBER 2 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm text-center p-3">
+                    <img src="{% static 'images/team2.jpg' %}" class="card-img-top rounded-circle mx-auto" alt="Team Member 2" style="width:120px;height:120px;object-fit:cover;">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-1">Carol Wamono</h5>
+                        <p class="text-warning mb-1">Service Advisor</p>
+                        <p class="text-muted small">Ensuring smooth communication and excellent customer service.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEAM MEMBER 3 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm text-center p-3">
+                    <img src="{% static 'images/team3.jpg' %}" class="card-img-top rounded-circle mx-auto" alt="Team Member 3" style="width:120px;height:120px;object-fit:cover;">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-1">Moses Nyongesa</h5>
+                        <p class="text-warning mb-1">Spare Parts Specialist</p>
+                        <p class="text-muted small">Providing genuine parts and expert advice for every vehicle.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEAM MEMBER 4 -->
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm text-center p-3">
+                    <img src="{% static 'images/team4.jpeg' %}" class="card-img-top rounded-circle mx-auto" alt="Team Member 4" style="width:120px;height:120px;object-fit:cover;">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-1">Timothy Wanjala</h5>
+                        <p class="text-warning mb-1">Customer Relations</p>
+                        <p class="text-muted small">Ensures every client feels confident and satisfied.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

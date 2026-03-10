@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-3">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert shadow-sm border-0 animate__animated animate__fadeInDown" 
+                 style="background-color: #800000; color: #D4AF37; border-left: 5px solid #D4AF37;">
+                <i class="fas fa-check-circle mr-2"></i> {{ message }}
+                <button type="button" class="close" data-dismiss="alert" style="color: #D4AF37;">
+                    <span>&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow booking-card p-4 p-md-5">
+                <h2 class="text-center mb-4 booking-header">Book Your Service</h2>
+                <hr style="border-color: var(--gold); width: 50px; margin: 0 auto 30px auto; border-width: 2px;">
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-user mr-2"></i> Full Name</label>
+                            {{ form.full_name }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-envelope mr-2"></i> Email</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-phone mr-2"></i> Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-map-marker-alt mr-2"></i> Location</label>
+                            {{ form.location }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-calendar-alt mr-2"></i> Preferred Time</label>
+                            {{ form.preferred_time }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-car mr-2"></i> Vehicle Type</label>
+                            {{ form.vehicle_type }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label><i class="fas fa-tools mr-2"></i> Service Type</label>
+                            {{ form.service_type }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="upload-section">
+                                <label><i class="fas fa-camera mr-2"></i> Upload Vehicle Image</label>
+                                {{ form.vehicle_image }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-booking px-5 py-3 shadow">
+                            CONFIRM BOOKING
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
