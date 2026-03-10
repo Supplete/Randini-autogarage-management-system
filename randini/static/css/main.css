@@ -4,146 +4,90 @@
 :root {
     --maroon: #800000;
     --gold: #ffc107;
-    --gold-hover: #e0ac00;
-    --black: #0f0f0f;
-    --white: #ffffff;
-    --light-bg: #f9f9f9;
-    --radius: 10px; /* Locked at 10px per user request */
-    --shadow: 0 4px 12px rgba(0,0,0,0.08);
-    --shadow-heavy: 0 12px 30px rgba(0,0,0,0.15);
+    --radius: 10px;
 }
 
 body {
-    background-color: var(--light-bg);
-    color: #333;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+/* Arial Black for high-impact garage branding */
+/* Removed text-transform: uppercase to keep letters small as requested */
+h1, h2, h3, .brand-font {
+    font-family: 'Arial Black', 'Arial Bold', sans-serif;
+    font-weight: 900;
 }
 
 /* ============================================================
-   2. NAVIGATION
+   2. LARGER NAVBAR (Lower Case Style)
    ============================================================ */
 .navbar {
-    padding: 0.5rem 0;
+    padding: 1.2rem 0; /* Keeps the navbar larger */
+    background-color: var(--maroon) !important;
 }
 
 .navbar-brand {
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    font-size: 1.8rem !important; /* Larger logo */
+    letter-spacing: -1px;
+    color: #fff !important;
 }
 
 .nav-link {
+    color: #ffffff !important; /* White fonts */
+    font-size: 1.1rem; /* Slightly larger as requested */
     font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.2s ease-in-out;
+    padding: 0.5rem 15px !important;
+    transition: all 0.3s ease;
+    /* No uppercase here */
 }
 
 .nav-link:hover {
     color: var(--gold) !important;
+    transform: translateY(-2px);
 }
 
 .user-pill {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 15px !important;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius);
+    padding: 8px 18px !important;
 }
 
-/* ============================================================
-   3. COMPONENTS (Radius Locking)
-   ============================================================ */
-.btn, 
-.card, 
-.dropdown-menu, 
-.form-control, 
-.auth-card, 
-.alert,
-.user-pill {
+.btn-lg-custom {
+    padding: 8px 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
     border-radius: var(--radius) !important;
 }
 
-/* Form Controls */
-.form-control {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    font-size: 0.95rem;
+/* ============================================================
+   3. GLOBAL COMPONENTS
+   ============================================================ */
+.btn, .card, .dropdown-menu, .form-control {
+    border-radius: var(--radius) !important;
 }
 
-.form-control:focus {
-    border-color: var(--maroon);
-    box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.15);
+.dropdown-menu {
+    background-color: #fff;
+    margin-top: 15px !important;
 }
 
-/* Buttons */
-.btn-warning {
-    background-color: var(--gold);
-    border-color: var(--gold);
-    color: var(--maroon);
-    font-weight: 600;
+.dropdown-item {
+    font-weight: 500;
+    padding: 10px 20px;
+    font-size: 1rem;
 }
 
-.btn-warning:hover {
-    background-color: var(--gold-hover);
-    border-color: var(--gold-hover);
-}
-
+/* ============================================================
+   4. UTILITIES
+   ============================================================ */
 .bg-maroon { background-color: var(--maroon) !important; }
 .text-maroon { color: var(--maroon) !important; }
+.text-warning { color: var(--gold) !important; }
 
-/* ============================================================
-   4. AUTHENTICATION UI
-   ============================================================ */
-.auth-container {
-    padding: 60px 0;
-    background: radial-gradient(circle at top right, #fff, #f1f1f1);
-}
-
-.auth-card {
-    background: white;
-    padding: 2.5rem;
-    border: none;
-    box-shadow: var(--shadow-heavy);
-    margin: 0 auto;
-}
-
-.password-wrapper {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--maroon);
-    text-transform: uppercase;
-    z-index: 10;
-}
-
-/* ============================================================
-   5. STAFF & DATA TABLES
-   ============================================================ */
-.table {
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: white;
-    box-shadow: var(--shadow);
-}
-
-.table thead {
-    background-color: #f8f9fa;
-    color: var(--maroon);
-}
-
-/* ============================================================
-   6. FOOTER
-   ============================================================ */
-footer {
-    padding: 1.5rem 0;
-    border-top: 3px solid var(--gold);
+footer .lead {
+    font-size: 1.05rem;
+    font-weight: 100;
 }
