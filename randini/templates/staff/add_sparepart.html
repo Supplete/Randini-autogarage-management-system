@@ -1,9 +1,24 @@
 {% extends 'staff/admin_base.html' %}
 {% block content %}
-<h2>Add Spare Part</h2>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Add Spare Part</button>
-</form>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-4" style="color: #800000;">add spare part</h3>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.as_p }}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'staff_inventory' %}" class="btn btn-light px-4">cancel</a>
+                            <button type="submit" class="btn btn-success px-4">save part</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

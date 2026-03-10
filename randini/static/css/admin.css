@@ -45,6 +45,31 @@
 body {
     font-family: 'Segoe UI', sans-serif;
 }
+/* Ensure the sidebar has a fixed width */
+.sidebar {
+    width: 250px;
+    z-index: 1000;
+}
+
+/* Ensure the main content starts AFTER the sidebar */
+.ms-sidebar {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* This fixes the table hiding the delete button */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.bg-maroon {
+    background-color: #800000 !important;
+}
 
 .sidebar {
     width: 250px;

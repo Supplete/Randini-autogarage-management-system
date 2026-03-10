@@ -161,33 +161,52 @@ def checkout(request):
         messages.error(request, "Your cart is empty!")
         return redirect('spareparts')
 
-    total_amount = sum(Decimal(item['price']) * item['quantity'] for item in cart.values())
+    # Calculate totals
+    subtotal = sum(Decimal(item['price']) * item['quantity'] for item in cart.values())
+    total_amount = subtotal # Add shipping logic here if needed
 
     if request.method == 'POST':
         phone = request.POST.get('phone')
         full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
         payment_method = request.POST.get('payment_method')
+
+        # 1. Clean Phone Number (Must be 2547XXXXXXXX)
+        # This takes the last 9 digits and adds 254
+        clean_phone = phone.replace(" ", "").replace("+", "")
+        formatted_phone = "254" + clean_phone[-9:]
 
         try:
             with transaction.atomic():
+                # 2. Create the Order
                 order = Order.objects.create(
                     user=request.user,
                     full_name=full_name,
-                    phone_number=phone,
+                    email=email,
+                    phone_number=formatted_phone,
+                    address=address,
+                    city=city,
                     total_amount=total_amount,
+                    payment_method=payment_method,
                     status='Pending'
                 )
 
+                # 3. Create Order Items
                 for item_id, item_data in cart.items():
                     part = SparePart.objects.get(id=item_id)
                     OrderItem.objects.create(
-                        order=order, part=part, # Changed 'product' to 'part'
-                        price=part.price, quantity=item_data['quantity']
+                        order=order,
+                        product=part, # Match your model field name (product)
+                        price=Decimal(item_data['price']),
+                        quantity=item_data['quantity']
                     )
 
+                # 4. Handle M-Pesa Payment
                 if payment_method == 'mpesa':
-                    formatted_phone = "254" + phone[1:] if phone.startswith("0") else phone
                     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+                    # Use your existing helper functions
                     password = generate_password(timestamp)
                     access_token = generate_access_token()
 
@@ -196,66 +215,84 @@ def checkout(request):
                         "Password": password,
                         "Timestamp": timestamp,
                         "TransactionType": "CustomerPayBillOnline",
-                        "Amount": 1, 
+                        "Amount": 1, # Use 1 for testing, or int(total_amount) for production
                         "PartyA": formatted_phone,
                         "PartyB": "174379",
                         "PhoneNumber": formatted_phone,
-                        "CallBackURL": "https://your-tunnel-url.loca.lt/mpesa-callback/",
+                        "CallBackURL": "https://your-ngrok-url.ngrok-free.app/mpesa-callback/", 
                         "AccountReference": f"Order{order.id}",
-                        "TransactionDesc": "Randini Spares"
+                        "TransactionDesc": f"Payment for Order {order.id}"
                     }
 
                     response = requests.post(
                         "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-                        json=payload, headers={"Authorization": f"Bearer {access_token}"}
+                        json=payload, 
+                        headers={"Authorization": f"Bearer {access_token}"}
                     )
                     res_data = response.json()
 
                     if res_data.get('ResponseCode') == '0':
                         order.mpesa_checkout_id = res_data.get('CheckoutRequestID')
                         order.save()
+                        
+                        # Clear session cart
                         request.session['cart'] = {}
-                        messages.success(request, "M-Pesa prompt sent!")
-                        return redirect('order_success')
+                        messages.success(request, "STK Push sent! Please enter your PIN on your phone.")
+                        return redirect('order_success', order_id=order.id)
+                    else:
+                        # Log Safaricom's specific error message
+                        error_msg = res_data.get('CustomerMessage', 'STK Push failed')
+                        raise Exception(error_msg)
                 
+                # 5. Handle Cash on Delivery
                 elif payment_method == 'cash':
                     request.session['cart'] = {}
-                    messages.success(request, "Order placed! Pay on delivery.")
-                    return redirect('order_success')
+                    messages.success(request, "Order placed successfully! We will contact you for delivery.")
+                    return redirect('order_success', order_id=order.id)
 
         except Exception as e:
-            messages.error(request, f"Checkout failed: {e}")
-            return redirect('cart')
+            messages.error(request, f"Checkout failed: {str(e)}")
+            return redirect('checkout')
 
-    return render(request, 'checkout.html', {'total_amount': total_amount})
-
+    # Pass everything the template needs
+    context = {
+        'cart_items': cart.values(),
+        'subtotal': subtotal,
+        'total': total_amount,
+    }
+    return render(request, 'checkout.html', context)
 @csrf_exempt
 def mpesa_callback(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        stk_callback = data['Body']['stkCallback']
-        result_code = stk_callback['ResultCode']
-        checkout_id = stk_callback['CheckoutRequestID']
-        
-        order = Order.objects.filter(mpesa_checkout_id=checkout_id).first()
-        
-        if result_code == 0 and order:
-            items = stk_callback['CallbackMetadata']['Item']
-            receipt = next(item['Value'] for item in items if item['Name'] == 'MpesaReceiptNumber')
+        try:
+            data = json.loads(request.body)
+            stk_callback = data['Body']['stkCallback']
+            result_code = stk_callback['ResultCode']
+            checkout_id = stk_callback['CheckoutRequestID']
             
-            order.status = 'Completed'
-            order.payment_status = 'Paid'
-            order.transaction_id = receipt
-            order.save()
+            order = Order.objects.filter(mpesa_checkout_id=checkout_id).first()
             
-            # Stock is deducted when Staff clicks 'Complete' in staff views
-        return JsonResponse({"ResultCode": 0, "ResultDesc": "Success"})
+            if order:
+                if result_code == 0:
+                    # Payment Successful
+                    items = stk_callback['CallbackMetadata']['Item']
+                    receipt = next(item['Value'] for item in items if item['Name'] == 'MpesaReceiptNumber')
+                    
+                    order.status = 'Completed'
+                    order.payment_status = 'Paid'
+                    order.transaction_id = receipt
+                else:
+                    # Payment Failed or Cancelled by User
+                    order.status = 'Failed'
+                    order.payment_status = 'Unpaid'
+                
+                order.save()
+                
+        except Exception as e:
+            print(f"Callback Error: {e}") # Log this to your terminal
+            
+        return JsonResponse({"ResultCode": 0, "ResultDesc": "Accepted"})
 
-@login_required
-def order_success(request):
-    order = Order.objects.filter(user=request.user).order_by('-created_at').first()
-    if not order: return redirect('home')
-    return render(request, 'order_success.html', {'order': order})
 
 # ============================================================
 # 4. AUTHENTICATION (USER & STAFF)
@@ -305,7 +342,19 @@ def login_view(request):
                 return redirect("staff_login")
         messages.error(request, "Invalid username or password")
     return render(request, "login.html")
+@login_required
+def order_success(request, order_id):
+    # Fetch the order, ensuring it belongs to the logged-in user for security
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # We fetch the items linked to this order to show a summary
+    order_items = OrderItem.objects.filter(order=order)
 
+    context = {
+        'order': order,
+        'order_items': order_items,
+    }
+    return render(request, 'order_success.html', context)
 def staff_login(request):
     """Handles garage management login"""
     if request.method == "POST":
@@ -424,15 +473,7 @@ def staff_orders(request):
 
 
 
-@staff_member_required
-def staff_inventory(request):
-    query = request.GET.get('q', '')
-    parts = SparePart.objects.filter(Q(name__icontains=query)).order_by('-id') if query else SparePart.objects.all().order_by('-id')
-    return render(request, "staff/inventory.html", {
-        "parts": parts, "query": query,
-        "total_items": SparePart.objects.count(),
-        "low_stock_count": SparePart.objects.filter(stock_quantity__lt=5).count()
-    })
+
 
 @staff_member_required
 def staff_bookings(request):
@@ -472,7 +513,34 @@ def staff_inquiries(request):
             elif 'delete' in request.POST: msg.delete()
         return redirect('staff_inquiries')
     return render(request, 'staff/inquiries.html', {'inquiries': inquiries, 'unread_count': inquiries.filter(is_read=False).count()})
+def staff_inventory(request):
+    """
+    View to display, search, and monitor garage stock levels.
+    """
+    query = request.GET.get('q', '')
+    
+    # Base Queryset
+    parts = SparePart.objects.all()
 
+    # Apply Search Filter
+    if query:
+        parts = parts.filter(
+            Q(name__icontains=query) | 
+            Q(description__icontains=query)
+        )
+
+    # Statistics for the Dashboard Cards
+    total_items = SparePart.objects.count()
+    # Corrected field name: 'stock' instead of 'stock_quantity'
+    low_stock_count = SparePart.objects.filter(stock__lt=5).count()
+
+    context = {
+        'parts': parts.order_by('name'),
+        'query': query,
+        'total_items': total_items,
+        'low_stock_count': low_stock_count,
+    }
+    return render(request, 'staff/inventory.html', context)
 @staff_member_required
 def add_sparepart(request):
     form = SparePartForm(request.POST or None, request.FILES or None)
@@ -495,12 +563,12 @@ def delete_sparepart(request, part_id):
 
 
 @staff_member_required
-def analytics_report(request):
+def staff_analytics(request):
     last_30_days = timezone.now() - timedelta(days=30)
     sales_data = Order.objects.filter(created_at__gte=last_30_days, status='Completed')\
         .values('created_at__date').annotate(total=Sum('total_amount')).order_by('created_at__date')
 
-    top_parts = OrderItem.objects.values('part__name')\
+    top_parts = OrderItem.objects.values('product__name')\
         .annotate(total_qty=Sum('quantity')).order_by('-total_qty')[:5]
 
     context = {
@@ -516,10 +584,36 @@ def analytics_report(request):
 
 @staff_member_required
 def staff_customers(request):
-    # Showing unique users who have made bookings
-    customers = User.objects.filter(is_staff=False).annotate(num_bookings=Count('booking')).order_by('-num_bookings')
-    return render(request, 'staff/customers.html', {'customers': customers})
+    """
+    View for staff to see all registered customers with search 
+    and a count of their total bookings.
+    """
+    # 1. Get the search term from the URL (e.g., ?q=trizah)
+    query = request.GET.get('q', '')
 
+    # 2. Start with all non-staff users and count their related 'bookings'
+    # Note: 'bookings' must match the related_name in your Booking model
+    customers = User.objects.filter(is_staff=False).annotate(
+        num_bookings=Count('bookings')
+    )
+
+    # 3. Apply search filters if a query exists
+    if query:
+        customers = customers.filter(
+            Q(first_name__icontains=query) | 
+            Q(last_name__icontains=query) | 
+            Q(email__icontains=query) |
+            Q(username__icontains=query)
+        )
+
+    # 4. Sort by most bookings first
+    customers = customers.order_by('-num_bookings')
+
+    context = {
+        'customers': customers,
+        'query': query,
+    }
+    return render(request, 'staff/customers.html', context)
 @staff_member_required
 def delete_customer(request, customer_id):
     customer = get_object_or_404(User, id=customer_id)

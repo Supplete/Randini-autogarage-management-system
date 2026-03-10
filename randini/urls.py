@@ -52,7 +52,8 @@ urlpatterns = [
     path('cart/remove/<int:part_id>/', views.remove_from_cart, name='remove_from_cart'),
     
     path('checkout/', views.checkout, name='checkout'),
-    path('order-success/', views.order_success, name='order_success'),
+    path('order-success/<int:order_id>/', views.order_success, name='order_success'),
+   
     path('mpesa-callback/', views.mpesa_callback, name='mpesa_callback'),
     path('staff/orders/<int:order_id>/complete/', views.complete_order, name='complete_order'),
     # ============================================================
@@ -73,8 +74,8 @@ urlpatterns = [
     path('staff/inventory/delete/<int:part_id>/', views.delete_sparepart, name='delete_sparepart'),
     path('staff/inventory/stock-report/', views.stock_report, name='stock_report'),
     
-    path('staff/analytics/', views.analytics_report, name='analytics_report'),
    
+    path('staff/analytics/', views.staff_analytics, name='staff_analytics'),
     # Customer Management
     path('staff/customers/', views.staff_customers, name='staff_customers'),
     path('staff/customers/delete/<int:customer_id>/', views.delete_customer, name='delete_customer'),

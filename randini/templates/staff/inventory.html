@@ -5,15 +5,16 @@
 
 {% block content %}
 <div class="container-fluid py-4" style="font-family: 'Segoe UI', sans-serif;">
-    
+
+    <!-- Summary Cards -->
     <div class="row mb-4">
-        <div class="col-md-3">
+        <div class="col-md-3 mb-3">
             <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 5px solid #800000;">
                 <small class="text-muted fw-bold">TOTAL ITEMS</small>
-                <h3 class="fw-bold mb-0">{{ total_items }}</h3>
+                <h3 class="fw-bold mb-0 text-dark">{{ total_items }}</h3>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mb-3">
             <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 5px solid #dc3545;">
                 <small class="text-muted fw-bold text-danger">LOW STOCK</small>
                 <h3 class="fw-bold mb-0 text-danger">{{ low_stock_count }}</h3>
@@ -21,45 +22,47 @@
         </div>
     </div>
 
+    <!-- Header + Search + Add New -->
     <div class="card border-0 shadow-sm mb-4" style="border-radius: 10px;">
         <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <h2 class="fw-bold mb-1" style="color: #800000;">Stock Inventory</h2>
-                    <p class="text-muted small mb-0">Monitor garage supplies and stock levels.</p>
+            <div class="row g-3 align-items-center">
+                <div class="col-xl-4 col-lg-12">
+                    <h2 class="fw-bold mb-1" style="color: #800000; white-space: nowrap;">Stock Inventory</h2>
                 </div>
-                <div class="col-md-5">
-                    <form method="GET" class="d-flex gap-2">
-                        <input type="text" name="q" class="form-control border-secondary-subtle" 
-                               placeholder="Search part name..." 
-                               value="{{ query }}"
-                               style="border-radius: 10px;">
-                        <button class="btn btn-dark px-4" type="submit" style="border-radius: 10px;">
-                            <i class="bi bi-search"></i>
-                        </button>
+                <div class="col-xl-5 col-lg-8">
+                    <form method="GET" action="{% url 'staff_inventory' %}" class="w-100">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control border-secondary-subtle"
+                                   placeholder="Search parts..." value="{{ query|default:'' }}"
+                                   style="border-radius: 10px 0 0 10px; height: 45px;">
+                            <button class="btn btn-dark px-4" type="submit" style="border-radius: 0 10px 10px 0;">
+                                Search
+                            </button>
+                        </div>
                     </form>
                 </div>
-                <div class="col-md-3 text-end">
-                    <a href="{% url 'add_sparepart' %}" class="btn btn-success fw-bold w-100" style="border-radius: 10px; padding: 10px;">
-                        <i class="bi bi-plus-lg me-1"></i> New Item
+                <div class="col-xl-3 col-lg-4 text-end">
+                    <a href="{% url 'add_sparepart' %}" class="btn btn-success fw-bold w-100 py-2" style="border-radius: 10px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                        New Item
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm" style="border-radius: 10px;">
+    <!-- Inventory Table -->
+    <div class="card border-0 shadow-sm" style="border-radius: 10px; overflow: hidden;">
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="table-responsive" style="width: 100%; overflow-x: auto;">
+                <table class="table table-hover align-middle mb-0" style="min-width: 900px; width: 100%;">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4 py-3 text-muted small">#</th>
-                            <th class="py-3 text-muted small">PREVIEW</th>
-                            <th class="py-3 text-muted small">NAME</th>
+                            <th class="ps-4 py-3 text-muted small" style="width: 50px;">#</th>
+                            <th class="py-3 text-muted small" style="width: 100px;">PREVIEW</th>
+                            <th class="py-3 text-muted small">PART DETAILS</th>
                             <th class="py-3 text-muted small text-center">PRICE</th>
                             <th class="py-3 text-muted small text-center">STOCK</th>
-                            <th class="py-3 text-muted small text-end pe-4">ACTIONS</th>
+                            <th class="py-3 text-muted small text-center" style="width: 200px;">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,42 +71,32 @@
                             <td class="ps-4 text-muted small">{{ forloop.counter }}</td>
                             <td>
                                 {% if part.image %}
-                                    <img src="{{ part.image.url }}" class="shadow-sm" 
-                                         style="width: 45px; height: 45px; object-fit: cover; border-radius: 8px;">
+                                    <img src="{{ part.image.url }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" class="shadow-sm">
                                 {% else %}
-                                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" 
-                                         style="width: 45px; height: 45px; border-radius: 8px; border: 1px dashed #ccc;">
-                                        <i class="bi bi-image" style="font-size: 0.8rem;"></i>
+                                    <div class="bg-light d-flex align-items-center justify-content-center border" style="width: 50px; height: 50px; border-radius: 8px;">
+                                        No Image
                                     </div>
                                 {% endif %}
                             </td>
                             <td>
                                 <div class="fw-bold text-dark mb-0">{{ part.name }}</div>
-                                <small class="text-muted">ID: {{ part.id }}</small>
+                                <small class="text-muted font-monospace">ID: {{ part.id }}</small>
                             </td>
-                            <td class="text-center fw-bold text-dark">
-                                Ksh {{ part.price }}
-                            </td>
+                            <td class="text-center fw-bold">Ksh {{ part.price }}</td>
                             <td class="text-center">
-                                {% if part.stock < 5 %}
-                                    <span class="badge bg-danger-subtle text-danger px-3 py-2" style="border-radius: 8px; width: 100px;">
-                                        {{ part.stock }} Left
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-success-subtle text-success px-3 py-2" style="border-radius: 8px; width: 100px;">
-                                        {{ part.stock }} Units
-                                    </span>
-                                {% endif %}
+                                <span class="badge {% if part.stock < 5 %}bg-danger{% else %}bg-success{% endif %} rounded-pill px-3 py-2" style="min-width: 80px;">
+                                    {{ part.stock }} In Stock
+                                </span>
                             </td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group">
-                                    <a href="{% url 'edit_sparepart' part.id %}" class="btn btn-sm btn-outline-primary px-3 me-2" style="border-radius: 8px;">
+                            <td class="text-center pe-4">
+                                <div class="d-flex justify-content-center gap-2 flex-wrap" style="min-width: 150px;">
+                                    <a href="{% url 'edit_sparepart' part.id %}" class="btn btn-sm btn-primary fw-bold px-3 mb-1" style="border-radius: 6px;">
                                         Edit
                                     </a>
-                                    <form action="{% url 'delete_sparepart' part.id %}" method="POST" class="d-inline" onsubmit="return confirm('Delete this part?')">
+                                    <form action="{% url 'delete_sparepart' part.id %}" method="POST" class="m-0">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 8px;">
-                                            <i class="bi bi-trash"></i>
+                                        <button type="submit" class="btn btn-sm btn-danger fw-bold px-3 mb-1" style="border-radius: 6px;" onclick="return confirm('Permanently delete this part?');">
+                                            Delete
                                         </button>
                                     </form>
                                 </div>
@@ -112,7 +105,7 @@
                         {% empty %}
                         <tr>
                             <td colspan="6" class="text-center py-5">
-                                <p class="text-muted mb-0">No parts found matching your search.</p>
+                                No inventory items found. Try a different search.
                             </td>
                         </tr>
                         {% endfor %}
@@ -123,9 +116,42 @@
     </div>
 </div>
 
+<!-- Custom CSS -->
 <style>
-    .bg-danger-subtle { background-color: #fceaea; color: #dc3545; }
-    .bg-success-subtle { background-color: #eafaf1; color: #28a745; }
-    .table-hover tbody tr:hover { background-color: #fbfbfb; }
+    .container-fluid {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .table-responsive {
+        border-radius: 0 0 10px 10px;
+    }
+
+    .btn-danger {
+        background-color: #d9534f !important;
+        border-color: #d43f3a !important;
+        color: white !important;
+    }
+
+    .btn-danger:hover {
+        background-color: #c9302c !important;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: white !important;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7 !important;
+    }
+
+    td .d-flex {
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
 </style>
 {% endblock %}
