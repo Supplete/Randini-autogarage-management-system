@@ -1,0 +1,277 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Invoice Preview | Randini Garage{% endblock %}
+{% block page_title %}Invoice Preview{% endblock %}
+
+{% block content %}
+<style>
+.invoice-preview {
+    background: white;
+    padding: 40px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #800000;
+    padding-bottom: 20px;
+}
+.invoice-logo {
+    flex: 1;
+}
+.invoice-logo h2 {
+    color: #800000;
+    font-weight: 700;
+    margin: 0;
+}
+.invoice-logo p {
+    color: #6c757d;
+    margin: 5px 0;
+}
+.invoice-details {
+    text-align: right;
+}
+.invoice-details h3 {
+    color: #800000;
+    font-weight: 600;
+    margin: 0;
+}
+.invoice-details p {
+    margin: 5px 0;
+    color: #495057;
+}
+.invoice-section {
+    margin-bottom: 30px;
+}
+.invoice-section h4 {
+    color: #800000;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #dee2e6;
+}
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.invoice-table th,
+.invoice-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+.invoice-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+.invoice-totals {
+    margin-top: 20px;
+    text-align: right;
+}
+.invoice-totals .total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.invoice-totals .grand-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #800000;
+    border-top: 2px solid #800000;
+    padding-top: 10px;
+}
+.invoice-actions {
+    margin-top: 30px;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 2px solid #dee2e6;
+}
+.spare-parts-list {
+    margin-top: 10px;
+}
+.spare-part-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-eye me-2" style="color:#800000;"></i>
+                            Invoice Preview
+                        </h5>
+                        <div>
+                            <form method="post" action="{% url 'create_invoice_from_booking' booking.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="send_invoice">
+                                <!-- Add hidden inputs for the invoice data -->
+                                <input type="hidden" name="labor_cost" value="{{ invoice.labor_cost }}">
+                                <input type="hidden" name="parts_cost" value="{{ invoice.parts_cost }}">
+                                <input type="hidden" name="tax_rate" value="{{ invoice.tax_rate }}">
+                                <input type="hidden" name="issue_date" value="{{ invoice.issue_date|date:'Y-m-d' }}">
+                                <input type="hidden" name="due_date" value="{{ invoice.due_date|date:'Y-m-d' }}">
+                                <input type="hidden" name="payment_method" value="{{ invoice.payment_method }}">
+                                <input type="hidden" name="notes" value="{{ invoice.notes }}">
+                                <input type="hidden" name="spare_parts" value="{{ invoice.spare_parts }}">
+                                <button type="submit" class="btn btn-success btn-sm me-2" onclick="return confirm('Send this invoice to {{ invoice.customer_email }}?')">
+                                    <i class="bi bi-envelope me-1"></i>Send Invoice
+                                </button>
+                            </form>
+                            <button onclick="window.print()" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="bi bi-printer me-1"></i>Print
+                            </button>
+                            <a href="{% url 'staff_bookings' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-left me-1"></i>Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="invoice-preview">
+                        <!-- Invoice Header -->
+                        <div class="invoice-header">
+                            <div class="invoice-logo">
+                                <h2>{{ invoice.garage_info.name }}</h2>
+                                <p>{{ invoice.garage_info.address }}</p>
+                                <p>{{ invoice.garage_info.phone }}</p>
+                                <p>{{ invoice.garage_info.email }}</p>
+                            </div>
+                            <div class="invoice-details">
+                                <h3>INVOICE</h3>
+                                <p><strong>#:</strong> {{ invoice.invoice_number }}</p>
+                                <p><strong>Date:</strong> {{ invoice.issue_date|date:"d M, Y" }}</p>
+                                <p><strong>Due:</strong> {{ invoice.due_date|date:"d M, Y" }}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-warning">{{ invoice.status|title }}</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Customer Information -->
+                        <div class="invoice-section">
+                            <h4>Bill To</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> {{ invoice.customer_name }}</p>
+                                    <p><strong>Email:</strong> {{ invoice.customer_email }}</p>
+                                    <p><strong>Phone:</strong> {{ invoice.customer_phone }}</p>
+                                    {% if invoice.customer_address %}
+                                    <p><strong>Address:</strong> {{ invoice.customer_address }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Service:</strong> {{ invoice.service_type }}</p>
+                                    <p><strong>Vehicle:</strong> {{ invoice.vehicle_type }}</p>
+                                    {% if invoice.vehicle_make %}
+                                    <p><strong>Make:</strong> {{ invoice.vehicle_make }}</p>
+                                    {% endif %}
+                                    {% if invoice.vehicle_model %}
+                                    <p><strong>Model:</strong> {{ invoice.vehicle_model }}</p>
+                                    {% endif %}
+                                    {% if invoice.vehicle_registration %}
+                                    <p><strong>Registration:</strong> {{ invoice.vehicle_registration }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Details -->
+                        <div class="invoice-section">
+                            <h4>Service Details</h4>
+                            <table class="invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     <tr>
+                                         <td>Labor Charges - {{ invoice.service_type }}</td>
+                                         <td>1</td>
+                                         <td>KSh {{ invoice.labor_cost|floatformat:2 }}</td>
+                                         <td>KSh {{ invoice.labor_cost|floatformat:2 }}</td>
+                                     </tr>
+                                    {% if invoice.spare_parts %}
+                                    {% for part in invoice.spare_parts %}
+                                    <tr>
+                                        <td colspan="3">{{ part.description }}</td>
+                                        <td>Included in Parts Cost</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Totals -->
+                        <div class="invoice-totals">
+                            <div class="total-row">
+                                <span>Subtotal:</span>
+                                <span>KSh {{ invoice.subtotal|floatformat:2 }}</span>
+                            </div>
+                            <div class="total-row">
+                                <span>Tax ({{ invoice.tax_rate }}%):</span>
+                                <span>KSh {{ invoice.tax_amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="total-row grand-total">
+                                <span>Total Amount:</span>
+                                <span>KSh {{ invoice.total|floatformat:2 }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Information -->
+                        <div class="invoice-section">
+                            <h4>Payment Information</h4>
+                            <p><strong>Payment Method:</strong> {{ invoice.get_payment_method_display }}</p>
+                            <p><strong>Due Date:</strong> {{ invoice.due_date|date:"d M, Y" }}</p>
+                            {% if invoice.notes %}
+                            <p><strong>Notes:</strong> {{ invoice.notes }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="invoice-actions">
+                            <p class="text-muted">Thank you for choosing {{ invoice.garage_info.name }}!</p>
+                            <p class="text-muted">Please make payment by the due date to avoid late fees.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .card-header,
+    .invoice-actions button,
+    .invoice-actions a {
+        display: none !important;
+    }
+    .invoice-preview {
+        box-shadow: none;
+        border: none;
+        padding: 20px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Create Invoice | Randini Garage{% endblock %}
+{% block page_title %}Create Invoice{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Create Invoice</h5>
+                </div>
+                <div class="card-body">
+                    {% if booking %}
+                    <div class="alert alert-info">
+                        <h6>Booking Information</h6>
+                        <p><strong>Customer:</strong> {{ booking.full_name }}</p>
+                        <p><strong>Service:</strong> {{ booking.get_service_type_display }}</p>
+                        <p><strong>Vehicle:</strong> {{ booking.get_vehicle_type_display }}</p>
+                        <p><strong>Email:</strong> {{ booking.email }}</p>
+                        <p><strong>Phone:</strong> {{ booking.phone }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" id="invoiceForm">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <h5>Please correct the following errors:</h5>
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                <li><strong>{{ field|title }}:</strong> {{ errors|join:", " }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Labor Cost</label>
+                                <input type="number" class="form-control" name="labor_cost" id="labor_cost"
+                                       value="{{ booking.price|default:0 }}" step="0.01" min="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tax Rate (%)</label>
+                                <input type="number" class="form-control" name="tax_rate" id="tax_rate"
+                                       value="16" step="0.1" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Subtotal</label>
+                                <input type="text" class="form-control" id="subtotal" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tax Amount</label>
+                                <input type="text" class="form-control" id="tax_amount" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Total Amount</label>
+                                <input type="text" class="form-control" id="total_amount" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Issue Date</label>
+                                <input type="date" class="form-control" name="issue_date" 
+                                       value="{% now 'Y-m-d' %}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" class="form-control" name="due_date"
+                                       value="{% load tz %}{% now 'Y-m-d'|date:'Y-m-d'|add_days:14 %}">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="payment_method" value="mpesa">
+                        <input type="hidden" name="parts_cost" value="0">
+                        <input type="hidden" name="spare_parts" value="">
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" name="action" value="save_draft" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Create Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Simple calculation script
+function calculateTotals() {
+    const laborCost = parseFloat(document.getElementById('labor_cost').value) || 0;
+    const taxRate = parseFloat(document.getElementById('tax_rate').value) || 0;
+
+    const subtotal = laborCost;
+    const taxAmount = (subtotal * taxRate) / 100;
+    const totalAmount = subtotal + taxAmount;
+
+    document.getElementById('subtotal').value = subtotal.toFixed(2);
+    document.getElementById('tax_amount').value = taxAmount.toFixed(2);
+    document.getElementById('total_amount').value = totalAmount.toFixed(2);
+}
+
+// Test email function
+function testEmail() {
+    alert('Testing email configuration...');
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('/staff/test-email/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'email': '{{ booking.email|default:"test@example.com" }}',
+            'message': 'Test email from invoice system'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Email test successful!');
+        } else {
+            alert('Email test failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Email test error: ' + error);
+    });
+}
+
+// Auto-calculate when values change
+document.getElementById('labor_cost').addEventListener('input', calculateTotals);
+document.getElementById('tax_rate').addEventListener('input', calculateTotals);
+
+// Initial calculation
+calculateTotals();
+</script>
+{% endblock %}

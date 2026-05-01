@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Randini Garage</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .welcome-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .welcome-header {
+            background: linear-gradient(135deg, #800000 0%, #600000 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .welcome-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .welcome-header p {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .welcome-content {
+            padding: 40px;
+            text-align: center;
+        }
+        .welcome-message {
+            font-size: 1.3rem;
+            color: #495057;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .welcome-message strong {
+            color: #800000;
+        }
+        .features-section {
+            margin: 40px 0;
+            text-align: left;
+        }
+        .features-section h2 {
+            color: #800000;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .feature-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #800000;
+        }
+        .feature-item h3 {
+            margin: 0 0 10px 0;
+            color: #800000;
+            font-size: 1.1rem;
+        }
+        .feature-item p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        .next-steps {
+            margin: 40px 0;
+            padding: 30px;
+            background: #d4edda;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .next-steps h2 {
+            margin: 0 0 20px 0;
+            color: #155724;
+            font-size: 1.3rem;
+        }
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .next-steps li {
+            margin: 10px 0;
+            color: #155724;
+            font-size: 1rem;
+        }
+        .contact-info {
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .contact-info h2 {
+            margin: 0 0 20px 0;
+            color: #800000;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .contact-item {
+            text-align: center;
+            padding: 15px;
+        }
+        .contact-item i {
+            font-size: 2rem;
+            color: #800000;
+            margin-bottom: 10px;
+        }
+        .contact-item h3 {
+            margin: 0 0 5px 0;
+            color: #495057;
+            font-size: 1rem;
+        }
+        .contact-item p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .footer {
+            text-align: center;
+            margin: 20px;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        .social-links {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px;
+            background: #800000;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 20px;
+            text-decoration: none;
+        }
+        .social-links a:hover {
+            background: #600000;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="welcome-container">
+        <!-- Welcome Header -->
+        <div class="welcome-header">
+            <h1>Welcome to Randini Auto Garage!</h1>
+            <p>Your Trusted Partner in Vehicle Care</p>
+        </div>
+
+        <!-- Welcome Content -->
+        <div class="welcome-content">
+            <div class="welcome-message">
+                Dear <strong>{{ customer.name }}</strong>,
+                <br><br>
+                Thank you for registering with Randini Auto Garage! We're excited to have you as part of our community. 
+                Your account has been successfully created and you're now ready to experience our premium vehicle services.
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <h2>What You Can Do With Your Account</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h3><i class="bi bi-calendar-check"></i> Book Services</h3>
+                        <p>Schedule vehicle maintenance, repairs, and diagnostics online at your convenience.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3><i class="bi bi-box-seam"></i> Buy Spare Parts</h3>
+                        <p>Browse and purchase genuine spare parts for your vehicle with doorstep delivery.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3><i class="bi bi-clock-history"></i> Track Orders</h3>
+                        <p>Monitor your service bookings and parts orders in real-time from your dashboard.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3><i class="bi bi-file-text"></i> View History</h3>
+                        <p>Access your complete service history and maintenance records anytime.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="next-steps">
+                <h2>🚀 Getting Started</h2>
+                <ul>
+                    <li><strong>Log In:</strong> Use your email and password to access your account</li>
+                    <li><strong>Complete Profile:</strong> Add your vehicle details for personalized service</li>
+                    <li><strong>Book First Service:</strong> Schedule your first maintenance appointment</li>
+                    <li><strong>Explore Services:</strong> Discover our full range of automotive services</li>
+                    <li><strong>Contact Us:</strong> Reach out anytime for assistance or questions</li>
+                </ul>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h2>Get In Touch</h2>
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <i class="bi bi-geo-alt"></i>
+                        <h3>Visit Us</h3>
+                        <p>Bungoma, Kenya</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-telephone"></i>
+                        <h3>Call Us</h3>
+                        <p>+254 711962088</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <h3>Email Us</h3>
+                        <p>randinigarage@gmail.com</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-clock"></i>
+                        <h3>Business Hours</h3>
+                        <p>Mon-Sat: 8AM-6PM</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" title="Twitter"><i class="bi bi-twitter"></i></a>
+                <a href="#" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Randini Auto Garage</strong></p>
+            <p>Bungoma, Kenya | +254 711962088 | randinigarage@gmail.com</p>
+            <p>This is an automated welcome email. Welcome to the Randini family!</p>
+        </div>
+    </div>
+</body>
+</html>

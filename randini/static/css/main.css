@@ -29,14 +29,24 @@ h1, h2, h3, .brand-font {
 }
 
 .navbar-brand {
-    font-size: 1.8rem !important; /* Larger logo */
+    font-size: 2.5rem !important; /* Larger logo */
     letter-spacing: -1px;
     color: #fff !important;
 }
 
+.navbar-logo {
+    height: 40px;
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.05);
+}
+
 .nav-link {
     color: #ffffff !important; /* White fonts */
-    font-size: 1.1rem; /* Slightly larger as requested */
+    font-size: 1.8rem; /* Slightly larger as requested */
     font-weight: 500;
     padding: 0.5rem 15px !important;
     transition: all 0.3s ease;
@@ -90,4 +100,219 @@ h1, h2, h3, .brand-font {
 footer .lead {
     font-size: 1.05rem;
     font-weight: 100;
+}
+
+/* ============================================================
+   5. MOBILE OPTIMIZATIONS
+   ============================================================ */
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.0rem !important;
+    }
+    
+    .nav-link {
+        font-size: 1rem !important;
+        padding: 0.5rem 10px !important;
+    }
+    
+    .navbar {
+        padding: 0.8rem 0;
+    }
+}
+
+/* Mobile Forms */
+@media (max-width: 768px) {
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 15px;
+    }
+    
+    .btn {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 20px;
+    }
+    
+    .card {
+        margin: 10px;
+        border-radius: 15px;
+    }
+}
+
+/* Mobile Tables */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.9rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 5px;
+    }
+    
+    /* Hide less important columns on mobile */
+    .table-hide-mobile {
+        display: none;
+    }
+}
+
+/* Touch-friendly buttons */
+@media (max-width: 768px) {
+    .btn {
+        min-height: 44px; /* iOS touch target minimum */
+        margin: 5px 0;
+    }
+    
+    .btn-sm {
+        min-height: 38px;
+        padding: 8px 15px;
+    }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 576px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Improve tap targets on mobile */
+@media (max-width: 768px) {
+    .nav-link,
+    .dropdown-item {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-check {
+        margin-bottom: 10px;
+    }
+    
+    .form-check-input {
+        transform: scale(1.2);
+    }
+}
+
+/* Mobile image optimizations */
+@media (max-width: 768px) {
+    .img-fluid {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .hero-section img {
+        margin-top: 2rem;
+    }
+}
+
+/* Mobile sidebar adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+        box-shadow: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-header {
+        padding: 15px;
+    }
+    
+    .sidebar-nav {
+        padding: 15px 0;
+    }
+}
+
+/* Mobile cart improvements */
+@media (max-width: 768px) {
+    .cart-item {
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+    }
+    
+    .cart-item img {
+        max-width: 80px;
+        height: auto;
+    }
+    
+    .cart-total {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin: 15px 0;
+    }
+}
+
+/* Mobile booking form improvements */
+@media (max-width: 768px) {
+    .booking-card {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .booking-header {
+        font-size: 1.4rem;
+    }
+    
+    .upload-section {
+        padding: 15px;
+        margin: 10px 0;
+    }
+}
+
+/* Mobile staff dashboard */
+@media (max-width: 768px) {
+    .staff-dashboard .card {
+        margin-bottom: 15px;
+    }
+    
+    .staff-dashboard .stat-card {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .staff-dashboard .stat-number {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile performance optimizations */
+@media (max-width: 768px) {
+    /* Reduce animations on mobile for better performance */
+    .animate__animated {
+        animation-duration: 0.5s;
+    }
+    
+    /* Optimize images for mobile */
+    img {
+        content-visibility: auto;
+    }
+    
+    /* Reduce box shadows for performance */
+    .shadow {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 }

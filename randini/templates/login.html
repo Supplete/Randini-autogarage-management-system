@@ -1,118 +1,193 @@
+<!-- Login Page Template -->
+<!-- Extends base.html for consistent layout and navigation -->
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Login | Randini Garage{% endblock %}
+<!-- Page Title -->
+<!-- Sets browser tab title -->
+{% block title %}Login | Randini Autogarage{% endblock %}
 
 {% block content %}
+
+<!-- Custom Styles for Login Form -->
+<!-- Defines appearance and layout of authentication components -->
 <style>
-    .auth-container {
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-    .auth-card {
-        background: #fff;
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        width: 100%;
-        max-width: 400px;
-    }
-    .password-wrapper {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    .toggle-password {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #0d6efd;
-        font-size: 0.8rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        user-select: none;
-        z-index: 5;
-    }
-    .form-control {
-        height: 50px;
-        border-radius: 8px;
-        padding-right: 65px;
-    }
-    .btn-auth {
-        height: 50px;
-        background-color: #0d6efd;
-        border: none;
-        color: white;
-        font-weight: bold;
-        border-radius: 8px;
-        width: 100%;
-        transition: 0.3s;
-    }
-    .btn-auth:hover {
-        background-color: #0b5ed7;
-    }
-    .error-message {
-        background-color: #f8d7da;
-        color: #842029;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
-        text-align: center;
-    }
+  .auth-wrap { 
+    min-height:80vh; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    padding:30px 15px; 
+    background:linear-gradient(135deg,#f9f4f4 0%,#fff8f0 100%); 
+  }
+  
+  .auth-card { 
+    background:#fff; 
+    padding:45px 40px; 
+    border-radius:18px; 
+    box-shadow:0 12px 40px rgba(128,0,0,0.12); 
+    width:100%; 
+    max-width:420px; 
+  }
+  
+  .auth-logo { 
+    text-align:center; 
+    margin-bottom:28px; 
+  }
+  
+  .auth-logo i { 
+    font-size:2.8rem; 
+    color:#800000; 
+  }
+  
+  .auth-logo h4 { 
+    color:#800000; 
+    font-weight:700; 
+    margin-top:8px; 
+    margin-bottom:0; 
+  }
+  
+  .pw-wrap { 
+    position:relative; 
+  }
+  
+  .pw-wrap .toggle-pw { 
+    position:absolute; 
+    right:14px; 
+    top:50%; 
+    transform:translateY(-50%); 
+    cursor:pointer; 
+    color:#800000; 
+    font-size:1rem; 
+    font-weight:700; 
+    user-select:none; 
+    z-index:5; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .form-control { 
+    height:50px; 
+    border-radius:10px; 
+    border:1.5px solid #dee2e6; 
+  }
+  
+  .form-control:focus { 
+    border-color:#800000; 
+    box-shadow:0 0 0 3px rgba(128,0,0,.12); 
+  }
+  
+  .btn-maroon-auth { 
+    height:50px; 
+    background:#800000; 
+    border:none; 
+    color:#fff; 
+    font-weight:700; 
+    border-radius:10px; 
+    width:100%; 
+    font-size:1rem; 
+    transition:.3s; 
+    letter-spacing:.5px; 
+  }
+  
+  .btn-maroon-auth:hover { 
+    background:#600000; 
+    color:#fff; 
+  }
+  
+  .divider { 
+    display:flex; 
+    align-items:center; 
+    gap:10px; 
+    margin:18px 0; 
+    color:#aaa; 
+    font-size:.85rem; 
+  }
+  
+  .divider::before,.divider::after { 
+    content:''; 
+    flex:1; 
+    height:1px; 
+    background:#e0e0e0; 
+  }
 </style>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <h2 class="fw-bold text-center mb-4">Login</h2>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="error-message">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="mb-3">
-                <input type="text" name="username" placeholder="Username" class="form-control" required>
-            </div>
-
-            <div class="password-wrapper">
-                <input type="password" name="password" id="password" placeholder="Password" class="form-control" required>
-                <span class="toggle-password" onclick="togglePassword('password', this)">Show</span>
-            </div>
-
-            <div class="text-end mb-3">
-                <a href="{% url 'password_reset' %}" class="small text-decoration-none">Forgot Password?</a>
-            </div>
-
-            <button type="submit" class="btn-auth">Login</button>
-        </form>
-
-        <div class="text-center mt-4">
-            <p class="mb-0 text-muted small">Don’t have an account? 
-                <a href="{% url 'register' %}" class="text-primary text-decoration-none fw-bold">Register</a>
-            </p>
-        </div>
+<!-- Login Form Container -->
+<!-- Centered authentication form with branding -->
+<div class="auth-wrap">
+  <div class="auth-card">
+    <!-- Logo and Header -->
+    <div class="auth-logo">
+      <i class="bi bi-gear-wide-connected"></i>
+      <h4>Randini Autogarage</h4>
+      <p class="text-muted small mb-0">Sign in to your account</p>
     </div>
+
+    <!-- Django Messages -->
+    <!-- Displays login success/error messages -->
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible py-2 rounded-3" role="alert">
+        <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+
+    <!-- Login Form -->
+    <!-- POST method for form submission -->
+    <!-- Includes email, password, and forgot password link -->
+    <form method="POST">
+      {% csrf_token %}
+      
+      <!-- Email Field -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold small">Email Address</label>
+        <input type="email" name="email" class="form-control" placeholder="you@example.com" required autofocus>
+      </div>
+      
+      <!-- Password Field with Show/Hide Toggle -->
+      <div class="mb-2 pw-wrap">
+        <label class="form-label fw-semibold small">Password</label>
+        <input type="password" name="password" id="pw-login" class="form-control" placeholder="Your password" required>
+        <span class="toggle-pw" onclick="togglePw('pw-login',this)">
+            <i class="bi bi-eye" id="pw-login-icon" style="font-weight: bold;"></i>
+        </span>
+      </div>
+      
+      <!-- Forgot Password Link -->
+      <div class="text-end mb-4">
+        <a href="{% url 'password_reset_request' %}" class="small text-decoration-none" style="color:#800000;">Forgot Password?</a>
+      </div>
+      
+      <!-- Submit Button -->
+      <button type="submit" class="btn-maroon-auth">Sign In</button>
+    </form>
+
+    <!-- Registration Link -->
+    <!-- Divider and sign-up option for new users -->
+    <div class="divider">or</div>
+    <div class="text-center">
+      <p class="mb-0 text-muted small">Don't have an account?
+        <a href="{% url 'register' %}" class="fw-bold text-decoration-none" style="color:#800000;">Create Account</a>
+      </p>
+    </div>
+  </div>
 </div>
 
+<!-- Password Toggle Script -->
+<!-- Allows users to show/hide password for better UX -->
 <script>
-function togglePassword(fieldId, element) {
-    var field = document.getElementById(fieldId);
-    if (field.type === "password") {
-        field.type = "text";
-        element.textContent = "Hide";
-    } else {
-        field.type = "password";
-        element.textContent = "Show";
-    }
+function togglePw(id, el) {
+  var f = document.getElementById(id);
+  var icon = document.getElementById(id + '-icon');
+  f.type = f.type === 'password' ? 'text' : 'password';
+  icon.className = f.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
 }
 </script>
+
+<!-- End of Login Content -->
+<!-- Form includes validation, password toggle, and registration link -->
 {% endblock %}

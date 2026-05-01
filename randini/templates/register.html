@@ -1,151 +1,358 @@
+<!-- Register Page Template -->
+<!-- Extends base.html for consistent layout and navigation -->
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Register | Randini Garage{% endblock %}
+<!-- Page Title -->
+<!-- Sets browser tab title -->
+{% block title %}Register | Randini Autogarage{% endblock %}
 
 {% block content %}
+
+<!-- Custom Styles for Registration Form -->
+<!-- Defines appearance and layout of registration components -->
 <style>
-    .auth-container {
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-    .auth-card {
-        background: #fff;
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        width: 100%;
-        max-width: 450px;
-    }
-    .password-wrapper {
-        position: relative;
-        margin-bottom: 15px;
-    }
-    .toggle-password {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #0d6efd;
-        font-size: 0.8rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        user-select: none;
-        z-index: 5;
-    }
-    .form-control {
-        height: 50px;
-        border-radius: 8px;
-        padding-right: 65px; /* Space for "Show" text */
-    }
-    .btn-auth {
-        height: 50px;
-        background-color: #0d6efd;
-        border: none;
-        color: white;
-        font-weight: bold;
-        border-radius: 8px;
-        width: 100%;
-        transition: 0.3s;
-    }
-    .btn-auth:hover {
-        background-color: #0b5ed7;
-    }
-    .error-message {
-        background-color: #f8d7da;
-        color: #842029;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
-    }
-    .password-rules {
-        background: #f8f9fa;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-bottom: 20px;
-    }
-    .password-rules ul {
-        margin-bottom: 0;
-        padding-left: 20px;
-    }
+  .auth-wrap { 
+    min-height:85vh; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    padding:30px 15px; 
+    background:linear-gradient(135deg,#f9f4f4 0%,#fff8f0 100%); 
+  }
+  
+  .auth-card { 
+    background:#fff; 
+    padding:40px; 
+    border-radius:18px; 
+    box-shadow:0 12px 40px rgba(128,0,0,0.12); 
+    width:100%; 
+    max-width:480px; 
+  }
+  
+  .auth-logo { 
+    text-align:center; 
+    margin-bottom:24px; 
+  }
+  
+  .auth-logo i { 
+    font-size:2.4rem; 
+    color:#800000; 
+  }
+  
+  .auth-logo h4 { 
+    color:#800000; 
+    font-weight:700; 
+    margin-top:6px; 
+    margin-bottom:0; 
+  }
+  
+  .pw-wrap { 
+    position:relative; 
+  }
+  
+  .pw-wrap .toggle-pw { 
+    position:absolute; 
+    right:14px; 
+    top:50%; 
+    transform:translateY(-50%); 
+    cursor:pointer; 
+    color:#800000; 
+    font-size:1rem; 
+    font-weight:700; 
+    user-select:none; 
+    z-index:5; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .form-control { 
+    height:50px; 
+    border-radius:10px; 
+    border:1.5px solid #dee2e6; 
+  }
+  
+  .form-control:focus { 
+    border-color:#800000; 
+    box-shadow:0 0 0 3px rgba(128,0,0,.12); 
+  }
+  
+  .btn-maroon-auth { 
+    height:50px; 
+    background:#800000; 
+    border:none; 
+    color:#fff; 
+    font-weight:700; 
+    border-radius:10px; 
+    width:100%; 
+    font-size:1rem; 
+    transition:.3s; 
+  }
+  
+  .btn-maroon-auth:hover { 
+    background:#600000; 
+    color:#fff; 
+  }
+  
+  .pw-rules { 
+    background:#fff8f0; 
+    border-left:3px solid #800000; 
+    padding:10px 14px; 
+    border-radius:0 8px 8px 0; 
+    font-size:.8rem; 
+    color:#555; 
+    margin-bottom:16px; 
+  }
+  
+  /* Password strength indicator */
+  .strength-bar { 
+    height: 5px; 
+    border-radius: 4px; 
+    background: #e8e5e0; 
+    overflow: hidden; 
+    margin-top: 8px; 
+  }
+  .strength-fill { 
+    height: 100%; 
+    border-radius: 4px; 
+    width: 0%; 
+    transition: width .3s, background .3s; 
+  }
+  .strength-text { 
+    font-size: .75rem; 
+    margin-top: 4px; 
+  }
+  
+  /* Password requirements */
+  .req-item { 
+    font-size:.78rem; 
+    color:#aaa; 
+    display:flex; 
+    align-items:center; 
+  }
+  .req-item.met { 
+    color:#28a745; 
+  }
+  .req-item.met i::before { 
+    content:"\f26b"; 
+  }
+  
+  /* Password match feedback */
+  .match-badge { 
+    font-size: .75rem; 
+    margin-top: 5px; 
+    display: flex; 
+    align-items: center; 
+    gap: 4px; 
+  }
 </style>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <h2 class="fw-bold text-center mb-4">Create Account</h2>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="error-message">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="mb-3">
-                <input type="text" name="name" placeholder="Full Name" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <input type="text" name="username" placeholder="Username" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <input type="tel" name="phone" placeholder="Phone Number (e.g. 07...)" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <input type="email" name="email" placeholder="Email Address" class="form-control" required>
-            </div>
-
-            <div class="password-wrapper">
-                <input type="password" name="password1" id="password1" placeholder="Password" class="form-control" required>
-                <span class="toggle-password" onclick="togglePassword('password1', this)">Show</span>
-            </div>
-
-            <div class="password-wrapper">
-                <input type="password" name="password2" id="password2" placeholder="Confirm Password" class="form-control" required>
-                <span class="toggle-password" onclick="togglePassword('password2', this)">Show</span>
-            </div>
-
-            <div class="password-rules">
-                <strong>Password Requirements:</strong>
-                <ul>
-                    <li>At least 8 characters</li>
-                    <li>Uppercase & Lowercase letters</li>
-                    <li>At least 1 special character (@, #, !, etc.)</li>
-                </ul>
-            </div>
-
-            <button type="submit" class="btn-auth">Register</button>
-        </form>
-
-        <div class="text-center mt-4">
-            <p class="mb-0 text-muted small">Already have an account? 
-                <a href="{% url 'login' %}" class="text-primary text-decoration-none fw-bold">Login</a>
-            </p>
-        </div>
+<!-- Registration Form Container -->
+<!-- Centered registration form with branding -->
+<div class="auth-wrap">
+  <div class="auth-card">
+    <!-- Logo and Header -->
+    <div class="auth-logo">
+      <i class="bi bi-person-plus-fill"></i>
+      <h4>Create Account</h4>
+      <p class="text-muted small mb-0">Join Randini Autogarage</p>
     </div>
+
+    <!-- Django Messages -->
+    <!-- Displays registration success/error messages -->
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible py-2 rounded-3" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i>{{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+
+    <!-- Registration Form -->
+    <!-- POST method for form submission -->
+    <!-- Includes personal information and profile fields -->
+    <form method="POST">
+      {% csrf_token %}
+      
+      <!-- Form Error Display -->
+      <!-- Shows non-field specific errors -->
+      {{ form.non_field_errors }}
+      {{ profile_form.non_field_errors }}
+      
+      <!-- Name Fields Row -->
+      <div class="row g-2 mb-3">
+        <!-- First Name Field -->
+        <div class="col-6">
+          <label class="form-label fw-semibold small">{{ form.first_name.label }}</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <!-- Last Name Field -->
+        <div class="col-6">
+          <label class="form-label fw-semibold small">{{ form.last_name.label }}</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Email Field -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold small">{{ form.email.label }}</label>
+        {{ form.email }}
+        <div class="form-text">You will log in with this email. A verification code will be sent here.</div>
+        {% if form.email.errors %}
+          <div class="text-danger small">{{ form.email.errors.0 }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Phone Number Field -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold small">{{ profile_form.phone_number.label }}</label>
+        {{ profile_form.phone_number }}
+        {% if profile_form.phone_number.errors %}
+          <div class="text-danger small">{{ profile_form.phone_number.errors.0 }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Password Fields with Show/Hide Toggle -->
+      <div class="pw-wrap mb-3">
+        <label class="form-label fw-semibold small">{{ form.password1.label }}</label>
+        {{ form.password1 }}
+        <span class="toggle-pw" onclick="togglePw('id_password1',this)">
+            <i class="bi bi-eye" id="id_password1-icon" style="font-weight: bold;"></i>
+        </span>
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <div class="strength-text" id="strength-text" style="color:#aaa;">Enter a password</div>
+        {% if form.password1.errors %}
+          <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Confirm Password Field -->
+      <div class="pw-wrap mb-3">
+        <label class="form-label fw-semibold small">{{ form.password2.label }}</label>
+        {{ form.password2 }}
+        <span class="toggle-pw" onclick="togglePw('id_password2',this)">
+            <i class="bi bi-eye" id="id_password2-icon" style="font-weight: bold;"></i>
+        </span>
+        <div id="match-feedback" class="match-badge" style="color:transparent;">—</div>
+        {% if form.password2.errors %}
+          <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+        {% endif %}
+      </div>
+      
+      <!-- Password Requirements -->
+      <div class="pw-rules">
+        <div style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:#aaa; margin-bottom:10px;">Password Requirements</div>
+        <div class="row g-1">
+          <div class="col-6"><span id="req-len"  class="req-item"><i class="bi bi-circle me-1"></i>At least 8 characters</span></div>
+          <div class="col-6"><span id="req-up"   class="req-item"><i class="bi bi-circle me-1"></i>Uppercase letter</span></div>
+          <div class="col-6"><span id="req-num"  class="req-item"><i class="bi bi-circle me-1"></i>Number</span></div>
+          <div class="col-6"><span id="req-spec" class="req-item"><i class="bi bi-circle me-1"></i>Special character</span></div>
+        </div>
+      </div>
+      
+      <!-- Submit Button -->
+      <button type="submit" class="btn-maroon-auth">Create Account & Verify Email</button>
+    </form>
+
+    <!-- Login Link -->
+    <!-- Option for existing users to sign in -->
+    <div class="text-center mt-3">
+      <p class="mb-0 text-muted small">Already have an account?
+        <a href="{% url 'login' %}" class="fw-bold text-decoration-none" style="color:#800000;">Sign In</a>
+      </p>
+    </div>
+  </div>
 </div>
 
+<!-- Password Toggle and Strength Script -->
+<!-- Allows users to show/hide passwords and see real-time strength feedback -->
 <script>
-function togglePassword(fieldId, element) {
-    var field = document.getElementById(fieldId);
-    if (field.type === "password") {
-        field.type = "text";
-        element.textContent = "Hide";
-    } else {
-        field.type = "password";
-        element.textContent = "Show";
-    }
+function togglePw(id, el) {
+  var f = document.getElementById(id);
+  var icon = document.getElementById(id + '-icon');
+  f.type = f.type === 'password' ? 'text' : 'password';
+  icon.className = f.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
 }
+
+// Password strength calculation
+function calcStrength(pw) {
+  let s = 0;
+  if (pw.length >= 8)          s += 25;
+  if (/[A-Z]/.test(pw))        s += 25;
+  if (/[0-9]/.test(pw))        s += 25;
+  if (/[^a-zA-Z0-9]/.test(pw)) s += 25;
+  return s;
+}
+
+// Update requirement indicators
+function setReq(id, met) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('met', met);
+  const icon = el.querySelector('i');
+  icon.className = met ? 'bi bi-check-circle-fill me-1' : 'bi bi-circle me-1';
+}
+
+// Handle password input changes
+function onPasswordInput() {
+  const pw = document.getElementById('id_password1')?.value || '';
+  const s  = calcStrength(pw);
+  const fill = document.getElementById('strength-fill');
+  const text = document.getElementById('strength-text');
+  if (!fill) return;
+
+  fill.style.width = s + '%';
+  if      (s <= 25) { fill.style.background = '#dc3545'; text.textContent = 'Weak';        text.style.color = '#dc3545'; }
+  else if (s <= 50) { fill.style.background = '#ffc107'; text.textContent = 'Fair';        text.style.color = '#b8860b'; }
+  else if (s <= 75) { fill.style.background = '#17a2b8'; text.textContent = 'Good';        text.style.color = '#17a2b8'; }
+  else              { fill.style.background = '#28a745'; text.textContent = 'Strong';       text.style.color = '#28a745'; }
+
+  setReq('req-len',  pw.length >= 8);
+  setReq('req-up',   /[A-Z]/.test(pw));
+  setReq('req-num',  /[0-9]/.test(pw));
+  setReq('req-spec', /[^a-zA-Z0-9]/.test(pw));
+
+  checkMatch();
+}
+
+// Check if passwords match
+function checkMatch() {
+  const p1  = document.getElementById('id_password1')?.value || '';
+  const p2  = document.getElementById('id_password2')?.value || '';
+  const fb  = document.getElementById('match-feedback');
+  if (!fb) return;
+  if (!p2) { fb.innerHTML = '&nbsp;'; fb.style.color = 'transparent'; return; }
+  if (p1 === p2) {
+    fb.innerHTML = '<i class="bi bi-check-circle-fill"></i> Passwords match';
+    fb.style.color = '#28a745';
+  } else {
+    fb.innerHTML = '<i class="bi bi-x-circle-fill"></i> Passwords do not match';
+    fb.style.color = '#dc3545';
+  }
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  const p1 = document.getElementById('id_password1');
+  const p2 = document.getElementById('id_password2');
+  if (p1) {
+    p1.addEventListener('input', onPasswordInput);
+  }
+  if (p2) {
+    p2.addEventListener('input', checkMatch);
+  }
+});
 </script>
+
+<!-- End of Registration Content -->
+<!-- Form includes validation, password requirements, and login link -->
 {% endblock %}

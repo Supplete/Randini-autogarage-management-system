@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ invoice.invoice_number }} - {{ invoice.garage_info.name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 40px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #800000;
+            padding-bottom: 20px;
+        }
+        .invoice-logo h1 {
+            color: #800000;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .invoice-logo p {
+            color: #666;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .invoice-details {
+            text-align: right;
+        }
+        .invoice-details h2 {
+            color: #800000;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+        }
+        .invoice-details p {
+            margin: 5px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        .invoice-section {
+            margin-bottom: 30px;
+        }
+        .invoice-section h3 {
+            color: #800000;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+            font-size: 18px;
+        }
+        .customer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .customer-info div {
+            flex: 1;
+        }
+        .customer-info p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .customer-info strong {
+            color: #333;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .invoice-table th,
+        .invoice-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .invoice-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        .invoice-table .text-right {
+            text-align: right;
+        }
+        .invoice-totals {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .invoice-totals .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .invoice-totals .grand-total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #800000;
+            border-top: 2px solid #800000;
+            padding-top: 10px;
+        }
+        .payment-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .payment-info h3 {
+            margin-top: 0;
+            color: #800000;
+        }
+        .payment-info p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .invoice-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        .spare-parts-list {
+            margin-top: 15px;
+        }
+        .spare-part-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 13px;
+        }
+        .status-badge {
+            background: #ffc107;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .invoice-container {
+                margin: 0;
+                padding: 20px;
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="invoice-logo">
+                <h1>{{ invoice.garage_info.name }}</h1>
+                <p>{{ invoice.garage_info.address }}</p>
+                <p>{{ invoice.garage_info.phone }}</p>
+                <p>{{ invoice.garage_info.email }}</p>
+            </div>
+            <div class="invoice-details">
+                <h2>INVOICE</h2>
+                <p><strong>Invoice #:</strong> {{ invoice.invoice_number }}</p>
+                <p><strong>Date:</strong> {{ invoice.issue_date|date:"d M, Y" }}</p>
+                <p><strong>Due Date:</strong> {{ invoice.due_date|date:"d M, Y" }}</p>
+                <p><strong>Status:</strong> <span class="status-badge">{{ invoice.status|title }}</span></p>
+            </div>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="invoice-section">
+            <h3>Bill To</h3>
+            <div class="customer-info">
+                <div>
+                    <p><strong>Customer Name:</strong> {{ invoice.customer_name }}</p>
+                    <p><strong>Email:</strong> {{ invoice.customer_email }}</p>
+                    <p><strong>Phone:</strong> {{ invoice.customer_phone }}</p>
+                    {% if invoice.customer_address %}
+                    <p><strong>Address:</strong> {{ invoice.customer_address }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <p><strong>Service Type:</strong> {{ invoice.service_type }}</p>
+                    <p><strong>Vehicle Type:</strong> {{ invoice.vehicle_type }}</p>
+                    {% if invoice.vehicle_make %}
+                    <p><strong>Vehicle Make:</strong> {{ invoice.vehicle_make }}</p>
+                    {% endif %}
+                    {% if invoice.vehicle_model %}
+                    <p><strong>Vehicle Model:</strong> {{ invoice.vehicle_model }}</p>
+                    {% endif %}
+                    {% if invoice.vehicle_registration %}
+                    <p><strong>Registration:</strong> {{ invoice.vehicle_registration }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Details -->
+        <div class="invoice-section">
+            <h3>Service Details</h3>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Labor Charges - Car Painting</td>
+                        <td>1</td>
+                        <td>KSh {{ invoice.labor_cost|floatformat:2 }}</td>
+                        <td class="text-right">KSh {{ invoice.labor_cost|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Parts & Materials</td>
+                        <td>1</td>
+                        <td>KSh {{ invoice.parts_cost|floatformat:2 }}</td>
+                        <td class="text-right">KSh {{ invoice.parts_cost|floatformat:2 }}</td>
+                    </tr>
+                    {% if invoice.spare_parts %}
+                    {% for part in invoice.spare_parts %}
+                    <tr>
+                        <td colspan="3">{{ part.description }}</td>
+                        <td class="text-right">Included in Parts Cost</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="invoice-totals">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>KSh {{ invoice.subtotal|floatformat:2 }}</span>
+            </div>
+            <div class="total-row">
+                <span>Tax ({{ invoice.tax_rate }}%):</span>
+                <span>KSh {{ invoice.tax_amount|floatformat:2 }}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total Amount Due:</span>
+                <span>KSh {{ invoice.total|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+            <h3>Payment Information</h3>
+            <p><strong>Payment Method:</strong> {% if invoice.payment_method == 'mpesa' %}M-Pesa Mobile Money{% elif invoice.payment_method == 'cash' %}Cash Payment{% else %}{{ invoice.payment_method|title }}{% endif %}</p>
+            <p><strong>Due Date:</strong> {{ invoice.due_date|date:"d M, Y" }}</p>
+            {% if invoice.notes %}
+            <p><strong>Notes:</strong> {{ invoice.notes }}</p>
+            {% endif %}
+            <p><strong>Payment Instructions:</strong></p>
+            <p>• For M-Pesa: Send to {{ invoice.garage_info.phone }}</p>
+            <p>• For Bank Transfer: Contact us for account details</p>
+            <p>• Cash payments accepted at our garage</p>
+        </div>
+
+        <!-- Terms and Warranty -->
+        <div class="invoice-section">
+            <h3>Terms & Warranty</h3>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <p><strong>Warranty Period:</strong> 30 Days on Parts</p>
+                    <p><strong>Labor Warranty:</strong> 7 Days</p>
+                </div>
+                <div>
+                    <p><strong>VAT Number:</strong> {{ invoice.garage_info.vat_number }}</p>
+                    <p><strong>License:</strong> {{ invoice.garage_info.license_number }}</p>
+                </div>
+            </div>
+            <p style="font-size: 12px; margin-top: 10px; color: #666;">
+                <strong>Terms:</strong> Payment is due within 14 days. Late payments may incur additional charges.
+                All services are subject to our standard terms and conditions. Warranty applies to workmanship only.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="invoice-footer">
+            <p><strong>Thank you for choosing {{ invoice.garage_info.name }}!</strong></p>
+            <p>Please make payment by the due date to avoid late fees.</p>
+            <p>{{ invoice.garage_info.phone }} | {{ invoice.garage_info.email }}</p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-print when page loads
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

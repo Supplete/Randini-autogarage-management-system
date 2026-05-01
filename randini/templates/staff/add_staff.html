@@ -1,0 +1,158 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Add Staff | Randini Garage{% endblock %}
+{% block page_title %}Add New Staff Member{% endblock %}
+
+{% block content %}
+<style>
+  .password-toggle {
+    position: relative;
+  }
+  .password-toggle i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+  .password-toggle i:hover {
+    color: #495057;
+  }
+</style>
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <p class="text-muted small mb-4">Fill in the details below. The staff member will receive a welcome email with their login credentials.</p>
+
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} py-2 rounded-3" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+
+        <form method="POST">
+          {% csrf_token %}
+          
+          {{ form.non_field_errors }}
+          
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold small">{{ form.first_name.label }}</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small">{{ form.last_name.label }}</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">{{ form.email.label }}</label>
+              {{ form.email }}
+              <div class="form-text">This will be used for login</div>
+              {% if form.email.errors %}
+                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">{{ form.role.label }}</label>
+              {{ form.role }}
+              {% if form.role.errors %}
+                <div class="text-danger small">{{ form.role.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle"></i>
+                  Mechanic → Bookings | Inventory → Spare Parts | Inquiries → Customer Messages | Admin → Full Access
+                </small>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small">{{ form.password.label }}</label>
+              <div class="password-toggle">
+                {{ form.password }}
+                <i class="bi bi-eye-slash" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+              </div>
+              {% if form.password.errors %}
+                <div class="text-danger small">{{ form.password.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text">{{ form.password.help_text }}</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small">{{ form.confirm_password.label }}</label>
+              <div class="password-toggle">
+                {{ form.confirm_password }}
+                <i class="bi bi-eye-slash" id="toggleConfirmPassword" onclick="toggleConfirmPasswordVisibility()"></i>
+              </div>
+              {% if form.confirm_password.errors %}
+                <div class="text-danger small">{{ form.confirm_password.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">{{ form.bio.label }}</label>
+              {{ form.bio }}
+              <div class="form-text">Optional: e.g. Specialises in diesel engines</div>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="is_active" id="is_active" checked>
+                <label class="form-check-label" for="is_active">
+                  {{ form.is_active }}
+                  <span class="form-text">Create as active account (can login)</span>
+                </label>
+              </div>
+              <div class="form-text small text-muted">Uncheck to create inactive staff account (cannot login)</div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn fw-bold px-4" style="background:#800000;color:#fff;">
+              <i class="bi bi-person-check-fill me-1"></i> Create Staff Account
+            </button>
+            <a href="{% url 'manage_staff' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePasswordVisibility() {
+  const passwordInput = document.querySelector('input[name="password"]');
+  const toggleIcon = document.getElementById('togglePassword');
+  
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleIcon.classList.remove('bi-eye-slash');
+    toggleIcon.classList.add('bi-eye');
+  } else {
+    passwordInput.type = 'password';
+    toggleIcon.classList.remove('bi-eye');
+    toggleIcon.classList.add('bi-eye-slash');
+  }
+}
+
+function toggleConfirmPasswordVisibility() {
+  const confirmPasswordInput = document.querySelector('input[name="confirm_password"]');
+  const toggleIcon = document.getElementById('toggleConfirmPassword');
+  
+  if (confirmPasswordInput.type === 'password') {
+    confirmPasswordInput.type = 'text';
+    toggleIcon.classList.remove('bi-eye-slash');
+    toggleIcon.classList.add('bi-eye');
+  } else {
+    confirmPasswordInput.type = 'password';
+    toggleIcon.classList.remove('bi-eye');
+    toggleIcon.classList.add('bi-eye-slash');
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,340 @@
+{% extends 'staff/admin_base.html' %}
+{% load static %}
+
+{% block title %}Service Prices | Randini{% endblock %}
+{% block page_title %}Service Pricing Management{% endblock %}
+
+{% block content %}
+<style>
+  .price-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .price-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .service-badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+  .price-display {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #28a745;
+  }
+  .vehicle-badge {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+  }
+</style>
+
+<div class="container-fluid px-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-price-tag-fill text-warning me-2"></i>
+        Service Pricing
+      </h4>
+      <p class="text-muted mb-0">Manage fixed prices for all garage services by vehicle type</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-secondary" onclick="refreshPrices()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+      </button>
+      <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPriceModal">
+        <i class="bi bi-plus-circle me-1"></i>Add Price
+      </button>
+    </div>
+  </div>
+
+  <!-- Service Price Cards -->
+  <div class="row">
+    {% for service in services %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card price-card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <span class="badge service-badge bg-primary">{{ service.get_service_type_display }}</span>
+            <span class="vehicle-badge ms-2">{{ service.get_vehicle_type_display }}</span>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" 
+                   id="active-{{ service.id }}" 
+                   {% if service.is_active %}checked{% endif %}
+                   onchange="toggleServiceStatus({{ service.id }})">
+            <label class="form-check-label" for="active-{{ service.id }}"></label>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="price-display mb-3">
+            KSh {{ service.base_price|floatformat:0 }}
+          </div>
+          <p class="text-muted small mb-3">{{ service.description|truncatewords:15 }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              <i class="bi bi-clock me-1"></i>
+              Updated {{ service.updated_at|date:"M d, Y" }}
+            </small>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary" onclick="editPrice({{ service.id }})">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger" onclick="deletePrice({{ service.id }})">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="text-center py-5">
+        <i class="bi bi-price-tag text-muted" style="font-size: 3rem;"></i>
+        <h5 class="text-muted mt-3">No Service Prices Set</h5>
+        <p class="text-muted">Click "Add Price" to set up pricing for your services.</p>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPriceModal">
+          <i class="bi bi-plus-circle me-1"></i>Add First Price
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Add/Edit Price Modal -->
+<div class="modal fade" id="addPriceModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-price-tag-fill text-warning me-2"></i>
+          <span id="modalTitle">Add Service Price</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="priceForm">
+          <input type="hidden" id="priceId" name="id">
+          
+          <div class="mb-3">
+            <label for="serviceType" class="form-label">Service Type</label>
+            <select class="form-select" id="serviceType" name="service_type" required>
+              <option value="">Select Service</option>
+              <option value="engine">Engine Repair</option>
+              <option value="body">Body Work</option>
+              <option value="painting">Car Painting</option>
+              <option value="oil">Oil Change</option>
+              <option value="diagnostic">Vehicle Diagnostic</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="vehicleType" class="form-label">Vehicle Type</label>
+            <select class="form-select" id="vehicleType" name="vehicle_type" required>
+              <option value="">Select Vehicle Type</option>
+              <option value="sedan">Sedan</option>
+              <option value="suv">SUV</option>
+              <option value="truck">Truck</option>
+              <option value="van">Van</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="basePrice" class="form-label">Base Price (KSh)</label>
+            <div class="input-group">
+              <span class="input-group-text">KSh</span>
+              <input type="number" class="form-control" id="basePrice" name="base_price" 
+                     step="0.01" min="0" required>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" 
+                      placeholder="Describe what's included in this service..."></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="isActive" name="is_active" checked>
+              <label class="form-check-label" for="isActive">
+                Service is currently offered
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" onclick="savePrice()">
+          <i class="bi bi-check-circle me-1"></i>Save Price
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function editPrice(id) {
+  // Fetch service price data and populate form
+  fetch(`/staff/api/service-price/${id}/`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('priceId').value = data.id;
+      document.getElementById('serviceType').value = data.service_type;
+      document.getElementById('vehicleType').value = data.vehicle_type;
+      document.getElementById('basePrice').value = data.base_price;
+      document.getElementById('description').value = data.description;
+      document.getElementById('isActive').checked = data.is_active;
+      document.getElementById('modalTitle').textContent = 'Edit Service Price';
+      
+      const modal = new bootstrap.Modal(document.getElementById('addPriceModal'));
+      modal.show();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      Swal.fire('Error', 'Failed to load service price', 'error');
+    });
+}
+
+function deletePrice(id) {
+  Swal.fire({
+    title: 'Delete Service Price?',
+    text: 'This will remove the pricing for this service and vehicle type combination.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Delete'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/staff/api/service-price/${id}/`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          Swal.fire('Deleted!', 'Service price has been deleted.', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          Swal.fire('Error', 'Failed to delete service price', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error', 'Failed to delete service price', 'error');
+      });
+    }
+  });
+}
+
+function toggleServiceStatus(id) {
+  const checkbox = document.getElementById(`active-${id}`);
+  const isActive = checkbox.checked;
+  
+  fetch(`/staff/api/service-price/${id}/`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({ is_active: isActive })
+  })
+  .then(response => response.json())
+  .then(data => {
+    Swal.fire({
+      icon: 'success',
+      title: isActive ? 'Activated' : 'Deactivated',
+      text: `Service has been ${isActive ? 'activated' : 'deactivated'}`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    checkbox.checked = !isActive; // Revert on error
+    Swal.fire('Error', 'Failed to update service status', 'error');
+  });
+}
+
+function savePrice() {
+  const form = document.getElementById('priceForm');
+  const formData = new FormData(form);
+  
+  const priceId = document.getElementById('priceId').value;
+  const isEdit = priceId !== '';
+  
+  const url = isEdit ? `/staff/api/service-price/${priceId}/` : '/staff/api/service-price/';
+  const method = isEdit ? 'PATCH' : 'POST';
+  
+  fetch(url, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({
+      service_type: formData.get('service_type'),
+      vehicle_type: formData.get('vehicle_type'),
+      base_price: formData.get('base_price'),
+      description: formData.get('description'),
+      is_active: formData.get('is_active') === 'on'
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.id || data.success) {
+      Swal.fire({
+        icon: 'success',
+        title: isEdit ? 'Updated!' : 'Created!',
+        text: `Service price has been ${isEdit ? 'updated' : 'created'}`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      Swal.fire('Error', 'Failed to save service price', 'error');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire('Error', 'Failed to save service price', 'error');
+  });
+}
+
+function refreshPrices() {
+  location.reload();
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Reset modal when hidden
+document.getElementById('addPriceModal').addEventListener('hidden.bs.modal', function () {
+  document.getElementById('priceForm').reset();
+  document.getElementById('priceId').value = '';
+  document.getElementById('modalTitle').textContent = 'Add Service Price';
+});
+</script>
+{% endblock %}

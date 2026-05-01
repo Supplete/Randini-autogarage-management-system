@@ -1,36 +1,36 @@
-
 {% extends 'staff/admin_base.html' %}
+{% block title %}Edit {{ part.name }} | Randini Garage{% endblock %}
+{% block page_title %}Edit Spare Part{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-7">
-            <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-                <div class="card-body p-4">
-                    <h3 class="fw-bold mb-4" style="color: #800000;">edit: {{ part.name }}</h3>
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-8">
-                                {{ form.as_p }}
-                            </div>
-                            <div class="col-md-4 text-center">
-                                <label class="small fw-bold text-muted">current preview</label>
-                                {% if part.image %}
-                                    <img src="{{ part.image.url }}" class="img-fluid rounded mt-2 shadow-sm border">
-                                {% else %}
-                                    <div class="bg-light rounded p-4 text-muted small mt-2 border-dashed">no image</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{% url 'staff_inventory' %}" class="btn btn-light px-4">back</a>
-                            <button type="submit" class="btn btn-primary px-4" style="background-color: #800000; border: none;">update changes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+          </div>
+          {% endfor %}
+          {% if part.image %}
+          <div class="mb-3">
+            <p class="text-muted small">Current image:</p>
+            <img src="{{ part.image.url }}" width="80" class="rounded-2 border">
+          </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn fw-bold px-5 rounded-pill" style="background:#800000;color:#fff;">
+              <i class="bi bi-save-fill me-1"></i>Save Changes
+            </button>
+            <a href="{% url 'staff_inventory' %}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Randini Garage</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .confirmation-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .confirmation-header {
+            background: linear-gradient(135deg, #800000 0%, #600000 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .company-info h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .company-info p {
+            margin: 5px 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .confirmation-title {
+            text-align: center;
+            margin: 30px 20px;
+            color: #800000;
+        }
+        .confirmation-title h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .thank-you-banner {
+            text-align: center;
+            margin: 30px 20px;
+            padding: 20px;
+            background: #d4edda;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .thank-you-banner h3 {
+            margin: 0 0 10px 0;
+            color: #155724;
+            font-size: 1.3rem;
+        }
+        .thank-you-banner p {
+            margin: 5px 0;
+            color: #155724;
+            font-size: 1rem;
+        }
+        .order-info {
+            margin: 0 20px 30px 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #800000;
+        }
+        .order-info h3 {
+            margin: 0 0 15px 0;
+            color: #800000;
+            font-size: 1.1rem;
+        }
+        .order-info p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        .order-details {
+            margin: 0 20px 30px 20px;
+        }
+        .order-details h3 {
+            margin: 0 0 15px 0;
+            color: #800000;
+            font-size: 1.1rem;
+        }
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .order-table th {
+            background: #800000;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .order-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+        .order-table tr:last-child td {
+            border-bottom: none;
+        }
+        .amount {
+            text-align: right;
+            font-weight: 600;
+            color: #28a745;
+        }
+        .total-section {
+            margin: 0 20px 30px 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: right;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        .total-row.grand-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #800000;
+            border-top: 2px solid #800000;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+        .collection-info {
+            margin: 0 20px 30px 20px;
+            padding: 20px;
+            background: #d1ecf1;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+        }
+        .collection-info h3 {
+            margin: 0 0 15px 0;
+            color: #0c5460;
+            font-size: 1.1rem;
+        }
+        .collection-info p {
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #0c5460;
+        }
+        .footer {
+            text-align: center;
+            margin: 20px;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        .contact-info {
+            margin: 30px 20px;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .contact-info h3 {
+            margin: 0 0 15px 0;
+            color: #800000;
+            font-size: 1.1rem;
+        }
+        .contact-info p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <!-- Confirmation Header -->
+        <div class="confirmation-header">
+            <div class="company-info">
+                <h1>RANDINI AUTO GARAGE</h1>
+                <p>Bungoma, Kenya</p>
+                <p>Contact: +254 711962088 | Email: randinigarage@gmail.com</p>
+            </div>
+        </div>
+
+        <!-- Confirmation Title -->
+        <div class="confirmation-title">
+            <h2>ORDER CONFIRMATION</h2>
+            <p>Order Number: ORD-{{ order.id|stringformat:"06d" }}</p>
+            <p>Date: {{ order_date|date:"F d, Y H:i" }}</p>
+        </div>
+        
+        <!-- Thank You Banner -->
+        <div class="thank-you-banner">
+            <h3>🎉 Thank You for Your Purchase!</h3>
+            <p>We appreciate your business and look forward to serving you again.</p>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="order-info">
+            <h3>Customer Information</h3>
+            <p><strong>Name:</strong> {{ customer.name }}</p>
+            <p><strong>Email:</strong> {{ customer.email }}</p>
+            <p><strong>Phone:</strong> {{ customer.phone }}</p>
+            {% if order.vehicle_info %}
+            <p><strong>Vehicle:</strong> {{ order.vehicle_info }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Order Details -->
+        <div class="order-details">
+            <h3>Order Details</h3>
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th class="amount">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.product.description|default:"No description available" }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>KSh {{ item.product.price|floatformat:2 }}</td>
+                        <td class="amount">KSh {% widthratio item.product.price 1 item.quantity %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Section -->
+        <div class="total-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>KSh {{ subtotal|floatformat:2 }}</span>
+            </div>
+            {% if discount %}
+            <div class="total-row">
+                <span>Discount:</span>
+                <span style="color: #dc3545;">-KSh {{ discount|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+            <div class="total-row">
+                <span>VAT (16%):</span>
+                <span>KSh {{ vat|floatformat:2 }}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total Paid:</span>
+                <span>KSh {{ total_amount|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <!-- Collection Information -->
+        <div class="collection-info">
+            <h3>Collection Information</h3>
+            <p><strong>Ready for Collection:</strong> {{ collection_ready_date|date:"F d, Y H:i" }}</p>
+            <p><strong>Location:</strong> Randini Auto Garage, Bungoma, Kenya</p>
+            <p><strong>What to Bring:</strong> This order confirmation email and ID</p>
+            <p><strong>Contact:</strong> +254 711962088 for any questions about collection</p>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <h3>Need Help?</h3>
+            <p>If you have any questions about your order, please don't hesitate to contact us:</p>
+            <p><strong>Phone:</strong> +254 711962088</p>
+            <p><strong>Email:</strong> randinigarage@gmail.com</p>
+            <p><strong>Location:</strong> Bungoma, Kenya</p>
+            <p><strong>Business Hours:</strong> Monday - Saturday, 8:00 AM - 6:00 PM</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Randini Auto Garage</strong></p>
+            <p>Bungoma, Kenya | +254 711962088 | randinigarage@gmail.com</p>
+            <p>This is an automated order confirmation. Please contact us if you have any questions.</p>
+        </div>
+    </div>
+</body>
+</html>

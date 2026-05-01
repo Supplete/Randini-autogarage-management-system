@@ -1,85 +1,1219 @@
-{% extends 'base.html' %}
-{% block title %}My Account | Randini Garage{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}My Account | Randini Autogarage{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --maroon: #800000;
+      --maroon-dark: #5e0000;
+      --maroon-mid: #a00000;
+      --gold: #ffc107;
+      --gold-soft: rgba(255,193,7,0.12);
+      --sidebar-w: 260px;
+    }
 
-{% block content %}
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2 class="fw-bold">Welcome back, {{ request.user.first_name }}!</h2>
-            <p class="text-muted">Track your garage services and spare part orders below.</p>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: #f2f0ec;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      color: #2a2a2a;
+      margin: 0;
+    }
+
+    /* ── Sidebar ─────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--maroon);
+      min-height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    .sidebar-brand {
+      padding: 24px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .brand-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      color: var(--gold);
+      font-size: 1.15rem;
+      letter-spacing: .3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-sub {
+      color: rgba(255,255,255,.5);
+      font-size: .78rem;
+      margin-top: 2px;
+      letter-spacing: .5px;
+    }
+
+    .sidebar-user {
+      padding: 14px 20px;
+      background: rgba(0,0,0,.18);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-user .s-name  { color: #fff; font-weight: 600; font-size: .95rem; }
+    .sidebar-user .s-role  { color: var(--gold); font-size: .76rem; text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.15) transparent;
+    }
+    .nav-section-title {
+      color: rgba(255,255,255,.35);
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      padding: 14px 20px 4px;
+      font-weight: 600;
+    }
+    .sidebar-nav .nav-link {
+      color: rgba(255,255,255,.78);
+      padding: 10px 12px;
+      margin: 2px 8px;
+      border-radius: 8px;
+      font-size: .88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background .18s, color .18s;
+      text-decoration: none;
+    }
+    .sidebar-nav .nav-link i { width: 18px; text-align: center; font-size: .95rem; flex-shrink: 0; }
+    .sidebar-nav .nav-link:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .sidebar-nav .nav-link.active { background: var(--gold); color: var(--maroon); font-weight: 600; }
+
+    .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,.1); }
+    .btn-logout {
+      width: 100%;
+      background: rgba(220,53,69,.82);
+      border: none;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: .85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-logout:hover { background: #dc3545; color: #fff; }
+
+    /* ── Main content ────────────────────────────── */
+    .main-content { margin-left: var(--sidebar-w); min-height: 100vh; }
+
+    .topbar {
+      background: #fff;
+      padding: 14px 28px;
+      border-bottom: 1px solid #e4e1db;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+    .topbar .page-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--maroon);
+      margin: 0;
+    }
+    .time-badge {
+      background: #f8f6f2;
+      border: 1px solid #e4e1db;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: .82rem;
+      color: #777;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-body { padding: 28px; }
+
+    /* ── Cards ───────────────────────────────────── */
+    .rcard {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e8e5e0;
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+      transition: box-shadow .2s;
+    }
+    .rcard:hover { box-shadow: 0 6px 24px rgba(128,0,0,.08); }
+    .rcard-body { padding: 24px 26px; }
+
+    .section-heading {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      color: var(--maroon);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    /* ── KPI Stats ───────────────────────────────── */
+    .stat-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e8e5e0;
+      padding: 20px 22px;
+      height: 100%;
+      transition: transform .2s, box-shadow .2s;
+      border-left: 5px solid transparent;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.07); }
+    .stat-label { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; color: #888; font-weight: 600; margin-bottom: 6px; }
+    .stat-value { font-size: 1.8rem; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+    .stat-sub { font-size: .78rem; color: #999; }
+
+    /* ── Profile avatar ──────────────────────────── */
+    .avatar-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold) 0%, #e6a800 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(255,193,7,.35);
+    }
+
+    /* ── Profile info rows ───────────────────────── */
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f2f0ec;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: #f8f6f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--maroon);
+      font-size: .9rem;
+      flex-shrink: 0;
+    }
+    .info-label { font-size: .75rem; color: #999; margin-bottom: 1px; }
+    .info-value { font-weight: 500; font-size: .92rem; color: #2a2a2a; }
+
+    /* ── Security cards ──────────────────────────── */
+    .security-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid #e8e5e0;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .security-item:last-child { margin-bottom: 0; }
+    .security-item:hover { border-color: var(--maroon); background: rgba(128,0,0,.03); }
+    .security-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .security-item .s-title { font-weight: 600; font-size: .9rem; margin-bottom: 2px; }
+    .security-item .s-desc  { font-size: .78rem; color: #888; }
+
+    /* ── Bookings table ──────────────────────────── */
+    .rtable thead th {
+      background: var(--maroon);
+      color: #fff;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      padding: 12px 16px;
+      border: none;
+      font-weight: 500;
+    }
+    .rtable tbody td { padding: 12px 16px; vertical-align: middle; font-size: .88rem; border-bottom: 1px solid #f2f0ec; }
+    .rtable tbody tr:hover { background: #fdf9f9; }
+    .rtable tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Status badges ───────────────────────────── */
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: .74rem;
+      font-weight: 600;
+    }
+    .badge-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .6; }
+    .status-pending    { background: #fff8e1; color: #b8860b; }
+    .status-confirmed  { background: #e8f5e9; color: #2e7d32; }
+    .status-in_progress{ background: #e3f2fd; color: #1565c0; }
+    .status-completed  { background: #e8f5e9; color: #2e7d32; }
+    .status-cancelled  { background: #fce4ec; color: #c62828; }
+
+    /* ── Quick actions ───────────────────────────── */
+    .quick-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 22px 16px;
+      border-radius: 12px;
+      border: 1px solid #e8e5e0;
+      text-decoration: none;
+      color: #2a2a2a;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      text-align: center;
+      cursor: pointer;
+      background: #fff;
+    }
+    .quick-action:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(128,0,0,.1); border-color: var(--maroon); color: #2a2a2a; }
+    .qa-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+
+    /* ── Modal ───────────────────────────────────── */
+    .rmodal .modal-content {
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    }
+    .rmodal .modal-header-custom {
+      background: var(--maroon);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .rmodal .modal-title-custom {
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rmodal .modal-title-custom small {
+      font-family: 'Poppins', sans-serif;
+      font-size: .78rem;
+      color: rgba(255,255,255,.55);
+      display: block;
+      font-weight: 400;
+      margin-top: 1px;
+    }
+    .rmodal .modal-body { padding: 28px 24px; }
+    .rmodal .btn-close-custom {
+      background: rgba(255,255,255,.15);
+      border: none;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255,255,255,.8);
+      font-size: 1rem;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    .rmodal .btn-close-custom:hover { background: rgba(255,255,255,.25); color: #fff; }
+
+    /* modal tabs */
+    .modal-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: #f2f0ec; border-radius: 10px; padding: 4px; }
+    .modal-tab {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      font-size: .85rem;
+      font-weight: 500;
+      color: #888;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .modal-tab.active { background: #fff; color: var(--maroon); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+    .modal-tab-panel { display: none; }
+    .modal-tab-panel.active { display: block; }
+
+    /* form elements */
+    .form-label-custom {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .form-control-custom {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e4e1db;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-family: 'Poppins', sans-serif;
+      color: #2a2a2a;
+      background: #faf9f7;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    .form-control-custom:focus {
+      border-color: var(--maroon);
+      box-shadow: 0 0 0 3px rgba(128,0,0,.08);
+      background: #fff;
+    }
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap .inp-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      font-size: .9rem;
+      pointer-events: none;
+    }
+    .input-icon-wrap .form-control-custom { padding-left: 36px; }
+    .input-icon-wrap .eye-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      cursor: pointer;
+      font-size: .9rem;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .input-icon-wrap .form-control-custom.has-eye { padding-right: 38px; }
+
+    /* password strength */
+    .strength-bar { height: 5px; border-radius: 4px; background: #e8e5e0; overflow: hidden; margin-top: 8px; }
+    .strength-fill { height: 100%; border-radius: 4px; width: 0%; transition: width .3s, background .3s; }
+    .strength-text { font-size: .75rem; margin-top: 4px; }
+
+    /* password match */
+    .match-badge { font-size: .75rem; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+
+    /* submit button */
+    .btn-maroon {
+      background: var(--maroon);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: .9rem;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-maroon:hover { background: var(--maroon-dark); transform: translateY(-1px); }
+    .btn-outline-r {
+      background: transparent;
+      color: #666;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      padding: 11px 20px;
+      font-size: .9rem;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-outline-r:hover { border-color: #999; color: #333; }
+
+    /* form hint */
+    .form-hint { font-size: .76rem; color: #999; margin-top: 4px; }
+    .form-error { font-size: .76rem; color: #dc3545; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+
+    /* alerts */
+    .alert-r {
+      border-radius: 10px;
+      border: none;
+      padding: 14px 18px;
+      font-size: .88rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border-left: 4px solid transparent;
+    }
+    .alert-success-r { background: #f0faf2; border-left-color: #28a745; color: #1a5e2a; }
+    .alert-danger-r  { background: #fff5f5; border-left-color: #dc3545; color: #7a1a1a; }
+    .alert-warning-r { background: #fffbea; border-left-color: #ffc107; color: #7a5800; }
+    .alert-info-r    { background: #f0f6ff; border-left-color: #0d6efd; color: #0a3d8f; }
+
+    /* empty state */
+    .empty-state { text-align: center; padding: 40px 20px; color: #bbb; }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+    .empty-state p { font-size: .88rem; margin: 0; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .mobile-toggle { display: flex !important; }
+      .page-body { padding: 18px; }
+    }
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 16px; left: 16px;
+      z-index: 1100;
+      background: var(--maroon);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Django password form fields override */
+    #id_old_password, #id_new_password1, #id_new_password2 {
+      width: 100%;
+      padding: 10px 36px 10px 36px;
+      border: 1.5px solid #e4e1db;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-family: 'Poppins', sans-serif;
+      color: #2a2a2a;
+      background: #faf9f7;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    #id_old_password:focus, #id_new_password1:focus, #id_new_password2:focus {
+      border-color: var(--maroon);
+      box-shadow: 0 0 0 3px rgba(128,0,0,.08);
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Mobile Toggle -->
+<button class="mobile-toggle" onclick="toggleSidebar()">
+  <i class="bi bi-list"></i>
+</button>
+
+<!-- ══════════════════════════════════════════════ SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-title">
+      <i class="bi bi-gear-fill"></i> Randini Garage
+    </div>
+    <div class="brand-sub">Customer Portal</div>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="s-name">{{ user.get_full_name|default:user.username }}</div>
+    <div class="s-role">{% if user.is_staff %}Staff{% else %}Customer{% endif %}</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    {% if user.is_staff %}
+      {% if user.is_superuser or user_role == 'admin' %}
+        <div class="nav-section-title">Management</div>
+        <a href="{% url 'staff_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{% url 'staff_bookings' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_bookings' %}active{% endif %}">
+          <i class="bi bi-calendar-check"></i> Bookings
+        </a>
+        <a href="{% url 'staff_inventory' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_inventory' %}active{% endif %}">
+          <i class="bi bi-box"></i> Inventory
+        </a>
+        <a href="{% url 'staff_inquiries' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_inquiries' %}active{% endif %}">
+          <i class="bi bi-envelope"></i> Inquiries
+        </a>
+        <a href="{% url 'staff_customers' %}" class="nav-link {% if request.resolver_match.url_name == 'staff_customers' %}active{% endif %}">
+          <i class="bi bi-people"></i> Customers
+        </a>
+        <a href="{% url 'manage_staff' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_staff' %}active{% endif %}">
+          <i class="bi bi-person-gear"></i> User Management
+        </a>
+      {% elif user_role == 'mechanic' %}
+        <div class="nav-section-title">Mechanic</div>
+        <a href="{% url 'mechanic_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'mechanic_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{% url 'mechanic_dashboard' %}" class="nav-link">
+          <i class="bi bi-calendar-check"></i> My Bookings
+        </a>
+      {% elif user_role == 'inventory' %}
+        <div class="nav-section-title">Inventory</div>
+        <a href="{% url 'inventory_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'inventory_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{% url 'inventory_dashboard' %}" class="nav-link">
+          <i class="bi bi-box"></i> Inventory
+        </a>
+      {% elif user_role == 'inquiries' %}
+        <div class="nav-section-title">Inquiries</div>
+        <a href="{% url 'inquiries_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'inquiries_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{% url 'inquiries_dashboard' %}" class="nav-link">
+          <i class="bi bi-envelope"></i> Inquiries
+        </a>
+      {% endif %}
+    {% else %}
+      <div class="nav-section-title">My Account</div>
+      <a href="{% url 'user_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
+        <i class="bi bi-person"></i> My Profile
+      </a>
+      <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="switchTab('tab-profile')">
+        <i class="bi bi-pencil-square"></i> Update Profile
+      </a>
+      <a href="{% url 'booking' %}" class="nav-link {% if request.resolver_match.url_name == 'booking' %}active{% endif %}">
+        <i class="bi bi-calendar-plus"></i> Book Service
+      </a>
+      <a href="{% url 'spareparts' %}" class="nav-link {% if request.resolver_match.url_name == 'spareparts' %}active{% endif %}">
+        <i class="bi bi-cart"></i> Parts Shop
+      </a>
+    {% endif %}
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{% url 'logout' %}" class="btn-logout">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════════ MAIN -->
+<main class="main-content">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <h1 class="page-title"><i class="bi bi-person-circle me-2" style="color:var(--gold); font-size:1rem;"></i>My Account</h1>
+    <div class="d-flex align-items-center gap-3">
+      <span class="time-badge">
+        <i class="bi bi-clock"></i>
+        <span id="current-time"></span>
+      </span>
+      <button class="btn-maroon" style="padding:8px 16px; font-size:.82rem;" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="switchTab('tab-profile')">
+        <i class="bi bi-pencil-square"></i> Edit Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Page Body -->
+  <div class="page-body">
+
+    <!-- Flash Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert-r alert-{{ message.tags }}-r mb-4" role="alert">
+          <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} flex-shrink-0"></i>
+          <div>{{ message }}</div>
         </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-xl-3">
+        <div class="stat-card" style="border-left-color: var(--gold);">
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-value text-primary">{{ total_bookings }}</div>
+          <div class="stat-sub">Service appointments</div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card" style="border-left-color: #28a745;">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value" style="color:#28a745;">{{ total_orders }}</div>
+          <div class="stat-sub">Parts purchased</div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card" style="border-left-color: #17a2b8;">
+          <div class="stat-label">Profile Complete</div>
+          <div class="stat-value" style="color:#17a2b8;">{{ profile_completion }}%</div>
+          <div class="stat-sub">Information filled</div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="stat-card" style="border-left-color: var(--maroon);">
+          <div class="stat-label">Days Member</div>
+          <div class="stat-value" style="color:var(--maroon);">{{ member_days }}</div>
+          <div class="stat-sub">Since registration</div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-7 mb-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3 border-0">
-                    <h5 class="mb-0 fw-bold text-maroon"><i class="fas fa-tools me-2"></i>My Service History</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr class="small">
-                                    <th class="ps-3">VEHICLE</th>
-                                    <th>SERVICE</th>
-                                    <th>STATUS</th>
-                                    <th class="pe-3">COST</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for b in bookings %}
-                                <tr>
-                                    <td class="ps-3">
-                                        <span class="fw-bold">{{ b.vehicle_type }}</span>
-                                    </td>
-                                    <td>{{ b.service_type }}</td>
-                                    <td>
-                                        {% if b.status == 'Completed' %}
-                                            <span class="badge bg-success">Ready</span>
-                                        {% elif b.status == 'In Progress' %}
-                                            <span class="badge bg-primary">In Garage</span>
-                                        {% else %}
-                                            <span class="badge bg-warning text-dark">Queued</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="pe-3 fw-bold">Ksh {{ b.price }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="4" class="text-center py-4">No services booked yet.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- Profile + Security Row -->
+    <div class="row g-4 mb-4">
+
+      <!-- Profile Card -->
+      <div class="col-lg-6">
+        <div class="rcard h-100">
+          <div class="rcard-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="section-heading"><i class="bi bi-person-badge me-2" style="font-size:.9rem;"></i>Profile</h5>
+              <button class="btn-maroon" style="padding:7px 14px; font-size:.8rem;"
+                      data-bs-toggle="modal" data-bs-target="#profileModal" onclick="switchTab('tab-profile')">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
             </div>
+
+            <!-- Avatar + name -->
+            <div class="d-flex align-items-center gap-4 mb-4 pb-4" style="border-bottom:1px solid #f2f0ec;">
+              <div class="avatar-circle flex-shrink-0">
+                <i class="bi bi-person-fill" style="font-size:2.5rem; color:var(--maroon);"></i>
+              </div>
+              <div>
+                <div style="font-size:1.1rem; font-weight:600;">{{ user.get_full_name|default:user.username }}</div>
+                <div style="font-size:.82rem; color:#888; margin-top:2px;">{{ user.email }}</div>
+                <span style="display:inline-block; margin-top:8px; background:var(--gold-soft); color:var(--maroon); font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:3px 10px; border-radius:20px;">
+                  {% if user.is_staff %}Staff{% else %}Customer{% endif %}
+                </span>
+              </div>
+            </div>
+
+            <!-- Info rows -->
+            <div class="info-row">
+              <div class="info-icon"><i class="bi bi-person"></i></div>
+              <div>
+                <div class="info-label">Full Name</div>
+                <div class="info-value">{{ user.get_full_name|default:"—" }}</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon"><i class="bi bi-envelope"></i></div>
+              <div>
+                <div class="info-label">Email Address</div>
+                <div class="info-value">{{ user.email }}</div>
+              </div>
+            </div>
+            {% if customer_profile %}
+            <div class="info-row">
+              <div class="info-icon"><i class="bi bi-telephone"></i></div>
+              <div>
+                <div class="info-label">Phone Number</div>
+                <div class="info-value">{{ customer_profile.phone_number|default:"—" }}</div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="info-row">
+              <div class="info-icon"><i class="bi bi-calendar-event"></i></div>
+              <div>
+                <div class="info-label">Member Since</div>
+                <div class="info-value">{{ user.date_joined|date:"M d, Y" }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Card -->
+      <div class="col-lg-6">
+        <div class="rcard h-100">
+          <div class="rcard-body">
+            <h5 class="section-heading mb-4"><i class="bi bi-shield-check me-2" style="font-size:.9rem;"></i>Account Security</h5>
+
+            <!-- Change Password -->
+            <a class="security-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="switchTab('tab-password')">
+              <div class="security-icon" style="background:#fff0f0; color:var(--maroon);">
+                <i class="bi bi-key"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="s-title">Change Password</div>
+                <div class="s-desc">Update your login password</div>
+              </div>
+              <i class="bi bi-chevron-right text-muted" style="font-size:.8rem;"></i>
+            </a>
+
+
+            <!-- 2FA -->
+            <div class="security-item" style="opacity:.6; cursor:default;">
+              <div class="security-icon" style="background:#f0f6ff; color:#1565c0;">
+                <i class="bi bi-shield-lock"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="s-title">Two-Factor Auth</div>
+                <div class="s-desc">Coming soon</div>
+              </div>
+              <span style="font-size:.7rem; background:#e8e5e0; color:#888; padding:2px 8px; border-radius:20px; font-weight:600;">SOON</span>
+            </div>
+
+            <!-- Security tips -->
+            <div class="mt-4 pt-3" style="border-top:1px solid #f2f0ec;">
+              <div style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.8px; color:#aaa; margin-bottom:10px;">Security Tips</div>
+              <div class="row g-2">
+                <div class="col-6"><div style="font-size:.78rem; color:#777; display:flex; align-items:center; gap:6px;"><i class="bi bi-check-circle-fill" style="color:#28a745; font-size:.7rem;"></i>Use a strong password</div></div>
+                <div class="col-6"><div style="font-size:.78rem; color:#777; display:flex; align-items:center; gap:6px;"><i class="bi bi-check-circle-fill" style="color:#28a745; font-size:.7rem;"></i>Enable 2FA when available</div></div>
+                <div class="col-6"><div style="font-size:.78rem; color:#777; display:flex; align-items:center; gap:6px;"><i class="bi bi-check-circle-fill" style="color:#28a745; font-size:.7rem;"></i>Keep email updated</div></div>
+                <div class="col-6"><div style="font-size:.78rem; color:#777; display:flex; align-items:center; gap:6px;"><i class="bi bi-check-circle-fill" style="color:#28a745; font-size:.7rem;"></i>Never share your password</div></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="rcard mb-4">
+      <div class="rcard-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="section-heading"><i class="bi bi-calendar-check me-2" style="font-size:.9rem;"></i>Recent Bookings</h5>
+          <a href="{% url 'booking' %}" class="btn-maroon" style="padding:7px 14px; font-size:.8rem; text-decoration:none;">
+            <i class="bi bi-plus"></i> New Booking
+          </a>
+        </div>
+        {% if bookings %}
+        <div class="table-responsive">
+          <table class="table rtable mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Service</th>
+                <th>Vehicle</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for booking in bookings %}
+              <tr>
+                <td style="color:#aaa; font-size:.8rem;">{{ booking.id }}</td>
+                <td style="font-weight:500;">{{ booking.service_type }}</td>
+                <td>{{ booking.vehicle_make }} {{ booking.vehicle_model }}</td>
+                <td style="color:#666;">{{ booking.preferred_date|date:"M d, Y" }}</td>
+                <td>
+                  <span class="badge-status status-{{ booking.status|lower }}">
+                    {{ booking.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-calendar-x"></i>
+          <p>No bookings yet. <a href="{% url 'booking' %}" style="color:var(--maroon);">Book a service</a> to get started.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="rcard">
+      <div class="rcard-body">
+        <h5 class="section-heading mb-4"><i class="bi bi-lightning me-2" style="font-size:.9rem;"></i>Quick Actions</h5>
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <a href="{% url 'booking' %}" class="quick-action">
+              <div class="qa-icon" style="background:rgba(255,193,7,.12);">
+                <i class="bi bi-calendar-plus" style="color:var(--gold);"></i>
+              </div>
+              <div style="font-weight:600; font-size:.88rem;">Book Service</div>
+              <div style="font-size:.76rem; color:#aaa;">Schedule appointment</div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a href="{% url 'spareparts' %}" class="quick-action">
+              <div class="qa-icon" style="background:rgba(40,167,69,.1);">
+                <i class="bi bi-cart" style="color:#28a745;"></i>
+              </div>
+              <div style="font-weight:600; font-size:.88rem;">Parts Shop</div>
+              <div style="font-size:.76rem; color:#aaa;">Browse spare parts</div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a href="#" class="quick-action" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="switchTab('tab-profile')">
+              <div class="qa-icon" style="background:rgba(23,162,184,.1);">
+                <i class="bi bi-person-gear" style="color:#17a2b8;"></i>
+              </div>
+              <div style="font-weight:600; font-size:.88rem;">Edit Profile</div>
+              <div style="font-size:.76rem; color:#aaa;">Update your info</div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a href="{% url 'logout' %}" class="quick-action">
+              <div class="qa-icon" style="background:rgba(220,53,69,.08);">
+                <i class="bi bi-box-arrow-right" style="color:#dc3545;"></i>
+              </div>
+              <div style="font-weight:600; font-size:.88rem;">Logout</div>
+              <div style="font-size:.76rem; color:#aaa;">Sign out safely</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════
+     UNIFIED PROFILE MODAL  (Profile Info + Password + Reset)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal fade rmodal" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header-custom">
+        <div>
+          <h5 class="modal-title-custom" id="profileModalLabel">
+            <span style="width:36px; height:36px; border-radius:50%; background:rgba(255,193,7,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="bi bi-person-gear" style="color:var(--gold); font-size:.95rem;"></i>
+            </span>
+            <div>
+              Account Settings
+              <small>Manage your profile &amp; security</small>
+            </div>
+          </h5>
+        </div>
+        <button class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+
+        <!-- Tabs -->
+        <div class="modal-tabs">
+          <button class="modal-tab active" id="tab-profile" onclick="switchTab('tab-profile')">
+            <i class="bi bi-person"></i> Profile Info
+          </button>
+          <button class="modal-tab" id="tab-password" onclick="switchTab('tab-password')">
+            <i class="bi bi-key"></i> Change Password
+          </button>
         </div>
 
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3 border-0">
-                    <h5 class="mb-0 fw-bold text-maroon"><i class="fas fa-shopping-basket me-2"></i>Spare Part Orders</h5>
+        <!-- ── Panel 1: Profile Info ── -->
+        <div class="modal-tab-panel active" id="panel-tab-profile">
+          <form method="post" action="{% url 'user_profile' %}">
+            {% csrf_token %}
+            <input type="hidden" name="update_profile" value="1">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label-custom">First Name</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-person inp-icon"></i>
+                  <input type="text" class="form-control-custom" name="first_name"
+                         value="{{ user.first_name }}" placeholder="First name" required>
                 </div>
-                <div class="card-body">
-                    {% for order in orders %}
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                        <div>
-                            <h6 class="mb-0 fw-bold">Order #{{ order.id }}</h6>
-                            <small class="text-muted">{{ order.created_at|date:"d M, Y" }}</small>
-                        </div>
-                        <div class="text-end">
-                            <p class="mb-0 fw-bold text-success">Ksh {{ order.total_amount }}</p>
-                            <span class="badge {% if order.status == 'Completed' %}bg-success{% else %}bg-secondary{% endif %} pt-1">
-                                {{ order.status }}
-                            </span>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <p class="text-center text-muted">No spare parts purchased yet.</p>
-                    {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom">Last Name</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-person inp-icon"></i>
+                  <input type="text" class="form-control-custom" name="last_name"
+                         value="{{ user.last_name }}" placeholder="Last name" required>
                 </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label-custom">Email Address</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-envelope inp-icon"></i>
+                  <input type="email" class="form-control-custom" name="email"
+                         value="{{ user.email }}" placeholder="your@email.com" required>
+                </div>
+                <div class="form-hint">This is your login email address.</div>
+              </div>
+              {% if customer_profile %}
+              <div class="col-12">
+                <label class="form-label-custom">Phone Number</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-telephone inp-icon"></i>
+                  <input type="tel" class="form-control-custom" name="phone_number"
+                         value="{{ customer_profile.phone_number }}"
+                         placeholder="+254 700 000 000"
+                         pattern="[+]?[0-9]{1,15}">
+                </div>
+              </div>
+              {% endif %}
             </div>
+            <div class="d-flex gap-2 mt-4 pt-3" style="border-top:1px solid #f2f0ec;">
+              <button type="submit" class="btn-maroon">
+                <i class="bi bi-check-circle"></i> Save Changes
+              </button>
+              <button type="button" class="btn-outline-r" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </form>
         </div>
+
+        <!-- ── Panel 2: Change Password ── -->
+        <div class="modal-tab-panel" id="panel-tab-password">
+          <form method="post" id="pw-change-form">
+            {% csrf_token %}
+            <input type="hidden" name="change_password" value="1">
+
+            <div class="row g-3">
+              <!-- Current password -->
+              <div class="col-12">
+                <label class="form-label-custom" for="{{ password_form.old_password.id_for_label }}">Current Password</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-lock inp-icon"></i>
+                  {{ password_form.old_password }}
+                  <button type="button" class="eye-toggle" onclick="toggleEye('{{ password_form.old_password.id_for_label }}', this)">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+                {% if password_form.old_password.errors %}
+                  {% for err in password_form.old_password.errors %}
+                    <div class="form-error"><i class="bi bi-exclamation-circle"></i>{{ err }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <!-- New password -->
+              <div class="col-md-6">
+                <label class="form-label-custom" for="{{ password_form.new_password1.id_for_label }}">New Password</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-shield-lock inp-icon"></i>
+                  {{ password_form.new_password1 }}
+                  <button type="button" class="eye-toggle" onclick="toggleEye('{{ password_form.new_password1.id_for_label }}', this)">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                <div class="strength-text" id="strength-text" style="color:#aaa;">Enter a password</div>
+                {% if password_form.new_password1.errors %}
+                  {% for err in password_form.new_password1.errors %}
+                    <div class="form-error"><i class="bi bi-exclamation-circle"></i>{{ err }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <!-- Confirm password -->
+              <div class="col-md-6">
+                <label class="form-label-custom" for="{{ password_form.new_password2.id_for_label }}">Confirm New Password</label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-shield-check inp-icon"></i>
+                  {{ password_form.new_password2 }}
+                  <button type="button" class="eye-toggle" onclick="toggleEye('{{ password_form.new_password2.id_for_label }}', this)">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+                <div id="match-feedback" class="match-badge" style="color:transparent;">—</div>
+                {% if password_form.new_password2.errors %}
+                  {% for err in password_form.new_password2.errors %}
+                    <div class="form-error"><i class="bi bi-exclamation-circle"></i>{{ err }}</div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <!-- Password requirements -->
+              <div class="col-12">
+                <div style="background:#faf9f7; border-radius:10px; padding:14px 16px; border:1px solid #f0ece6;">
+                  <div style="font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:#aaa; margin-bottom:10px;">Password Requirements</div>
+                  <div class="row g-1">
+                    <div class="col-6"><span id="req-len"  class="req-item"><i class="bi bi-circle me-1"></i>At least 8 characters</span></div>
+                    <div class="col-6"><span id="req-up"   class="req-item"><i class="bi bi-circle me-1"></i>Uppercase letter</span></div>
+                    <div class="col-6"><span id="req-num"  class="req-item"><i class="bi bi-circle me-1"></i>Number</span></div>
+                    <div class="col-6"><span id="req-spec" class="req-item"><i class="bi bi-circle me-1"></i>Special character</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4 pt-3" style="border-top:1px solid #f2f0ec;">
+              <button type="submit" class="btn-maroon">
+                <i class="bi bi-check-circle"></i> Update Password
+              </button>
+              <button type="button" class="btn-outline-r" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </form>
+
+          <style>
+            .req-item { font-size:.78rem; color:#aaa; display:flex; align-items:center; }
+            .req-item.met { color:#28a745; }
+            .req-item.met i::before { content:"\f26b"; } /* bi-check-circle-fill */
+          </style>
+        </div>
+
+
+      </div><!-- /modal-body -->
     </div>
+  </div>
 </div>
-{% endblock %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ── Clock ─────────────────────────────────────────── */
+function updateTime() {
+  document.getElementById('current-time').textContent =
+    new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:true });
+}
+updateTime();
+setInterval(updateTime, 1000);
+
+/* ── Mobile sidebar ─────────────────────────────────── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('show');
+}
+document.addEventListener('click', function(e) {
+  const sb = document.getElementById('sidebar');
+  if (window.innerWidth <= 768 && sb.classList.contains('show') &&
+      !sb.contains(e.target) && !document.querySelector('.mobile-toggle').contains(e.target)) {
+    sb.classList.remove('show');
+  }
+});
+
+/* ── Modal tab switcher ─────────────────────────────── */
+function switchTab(tabId) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.modal-tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.getElementById('panel-' + tabId).classList.add('active');
+}
+
+/* ── Eye toggle ─────────────────────────────────────── */
+function toggleEye(fieldId, btn) {
+  const inp = document.getElementById(fieldId);
+  if (!inp) return;
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  btn.querySelector('i').className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+}
+
+/* ── Password strength ──────────────────────────────── */
+const p1Id = '{{ password_form.new_password1.id_for_label }}';
+const p2Id = '{{ password_form.new_password2.id_for_label }}';
+
+function calcStrength(pw) {
+  let s = 0;
+  if (pw.length >= 8)          s += 25;
+  if (/[A-Z]/.test(pw))        s += 25;
+  if (/[0-9]/.test(pw))        s += 25;
+  if (/[^a-zA-Z0-9]/.test(pw)) s += 25;
+  return s;
+}
+
+function setReq(id, met) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('met', met);
+  const icon = el.querySelector('i');
+  icon.className = met ? 'bi bi-check-circle-fill me-1' : 'bi bi-circle me-1';
+}
+
+function onNewPasswordInput() {
+  const pw = document.getElementById(p1Id)?.value || '';
+  const s  = calcStrength(pw);
+  const fill = document.getElementById('strength-fill');
+  const text = document.getElementById('strength-text');
+  if (!fill) return;
+
+  fill.style.width = s + '%';
+  if      (s <= 25) { fill.style.background = '#dc3545'; text.textContent = 'Weak';        text.style.color = '#dc3545'; }
+  else if (s <= 50) { fill.style.background = '#ffc107'; text.textContent = 'Fair';        text.style.color = '#b8860b'; }
+  else if (s <= 75) { fill.style.background = '#17a2b8'; text.textContent = 'Good';        text.style.color = '#17a2b8'; }
+  else              { fill.style.background = '#28a745'; text.textContent = 'Strong';       text.style.color = '#28a745'; }
+
+  setReq('req-len',  pw.length >= 8);
+  setReq('req-up',   /[A-Z]/.test(pw));
+  setReq('req-num',  /[0-9]/.test(pw));
+  setReq('req-spec', /[^a-zA-Z0-9]/.test(pw));
+
+  checkMatch();
+}
+
+function checkMatch() {
+  const p1  = document.getElementById(p1Id)?.value || '';
+  const p2  = document.getElementById(p2Id)?.value || '';
+  const fb  = document.getElementById('match-feedback');
+  if (!fb) return;
+  if (!p2) { fb.innerHTML = '&nbsp;'; fb.style.color = 'transparent'; return; }
+  if (p1 === p2) {
+    fb.innerHTML = '<i class="bi bi-check-circle-fill"></i> Passwords match';
+    fb.style.color = '#28a745';
+  } else {
+    fb.innerHTML = '<i class="bi bi-x-circle-fill"></i> Passwords do not match';
+    fb.style.color = '#dc3545';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const f1 = document.getElementById(p1Id);
+  const f2 = document.getElementById(p2Id);
+  if (f1) {
+    f1.classList.add('has-eye');
+    f1.addEventListener('input', onNewPasswordInput);
+  }
+  if (f2) {
+    f2.classList.add('has-eye');
+    f2.addEventListener('input', checkMatch);
+  }
+  const old = document.getElementById('{{ password_form.old_password.id_for_label }}');
+  if (old) old.classList.add('has-eye');
+
+  });
+</script>
+
+/* Open modal on correct tab if form had errors */
+{% if password_form.errors %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+  modal.show();
+  switchTab('tab-password');
+});
+</script>
+{% endif %}
+
+</body>
+</html>

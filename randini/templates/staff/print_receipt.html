@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Receipt - {{ garage_info.name }}</title>
+    <style>
+        @media print {
+            body { font-size: 12px; }
+            .no-print { display: none !important; }
+            .receipt-container { 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 20px; 
+                box-shadow: none;
+            }
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .receipt-container { 
+            max-width: 400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header { text-align: center; border-bottom: 2px solid #800000; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { color: #800000; margin: 0; font-size: 24px; }
+        .header p { margin: 5px 0; color: #666; }
+        .receipt-info { margin-bottom: 20px; }
+        .receipt-info h3 { color: #800000; margin-bottom: 15px; font-size: 18px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .info-label { font-weight: 600; color: #333; }
+        .info-value { color: #666; }
+        .service-details { margin: 20px 0; }
+        .service-row { display: flex; justify-content: space-between; margin-bottom: 5px; padding: 5px 0; }
+        .total-row { border-top: 2px solid #800000; padding-top: 10px; margin-top: 10px; font-weight: bold; font-size: 16px; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px; }
+        .no-print { text-align: center; margin: 20px 0; }
+        .btn-print { background: #800000; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-print:hover { background: #600000; }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="header">
+            <h1>{{ garage_info.name }}</h1>
+            <p>{{ garage_info.address }}</p>
+            <p>{{ garage_info.phone }}</p>
+            <p>{{ garage_info.email }}</p>
+        </div>
+
+        <div class="receipt-info">
+            <h3>SERVICE RECEIPT</h3>
+            <div class="info-row">
+                <span class="info-label">Receipt #:</span>
+                <span class="info-value">{{ booking.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Date:</span>
+                <span class="info-value">{{ booking.created_at|date:"d M, Y H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Customer:</span>
+                <span class="info-value">{{ booking.full_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Phone:</span>
+                <span class="info-value">{{ booking.phone }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ booking.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Location:</span>
+                <span class="info-value">{{ booking.location }}</span>
+            </div>
+        </div>
+
+        <div class="service-details">
+            <h3>SERVICE DETAILS</h3>
+            <div class="service-row">
+                <span>Vehicle Type:</span>
+                <span>{{ booking.get_vehicle_type_display }}</span>
+            </div>
+            <div class="service-row">
+                <span>Service Type:</span>
+                <span>{{ booking.get_service_type_display }}</span>
+            </div>
+            <div class="service-row">
+                <span>Preferred Time:</span>
+                <span>{{ booking.preferred_time|date:"d M, Y H:i" }}</span>
+            </div>
+            {% if booking.actual_start_time %}
+            <div class="service-row">
+                <span>Service Started:</span>
+                <span>{{ booking.actual_start_time|date:"d M, Y H:i" }}</span>
+            </div>
+            {% endif %}
+            {% if booking.actual_end_time %}
+            <div class="service-row">
+                <span>Service Completed:</span>
+                <span>{{ booking.actual_end_time|date:"d M, Y H:i" }}</span>
+            </div>
+            {% endif %}
+            {% if booking.actual_start_time and booking.actual_end_time %}
+            <div class="service-row">
+                <span>Service Duration:</span>
+                <span>{{ booking.actual_start_time|timeuntil:booking.actual_end_time }}</span>
+            </div>
+            {% endif %}
+            <div class="service-row">
+                <span>Status:</span>
+                <span class="badge {% if booking.status == 'Completed' %}bg-success{% elif booking.status == 'In Progress' %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+                    {{ booking.status }}
+                </span>
+            </div>
+            {% if booking.staff_assigned %}
+            <div class="service-row">
+                <span>Technician:</span>
+                <span>{{ booking.staff_assigned.user.get_full_name }} ({{ booking.staff_assigned.profile.get_role_display }})</span>
+            </div>
+            {% endif %}
+            {% if booking.vehicle_make or booking.vehicle_model or booking.vehicle_year %}
+            <div class="service-row">
+                <span>Vehicle Details:</span>
+                <span>
+                    {% if booking.vehicle_year %}{{ booking.vehicle_year }} {% endif %}
+                    {% if booking.vehicle_make %}{{ booking.vehicle_make }} {% endif %}
+                    {% if booking.vehicle_model %}{{ booking.vehicle_model }}{% endif %}
+                    {% if booking.license_plate %}({{ booking.license_plate }}){% endif %}
+                </span>
+            </div>
+            {% endif %}
+            {% if booking.service_description %}
+            <div class="service-row">
+                <span>Service Description:</span>
+                <span>{{ booking.service_description|linebreaksbr }}</span>
+            </div>
+            {% endif %}
+            {% if booking.parts_used %}
+            <div class="service-row">
+                <span>Parts Used:</span>
+                <span>{{ booking.parts_used|linebreaksbr }}</span>
+            </div>
+            {% endif %}
+            {% if booking.labor_hours %}
+            <div class="service-row">
+                <span>Labor Hours:</span>
+                <span>{{ booking.labor_hours }} hours</span>
+            </div>
+            {% endif %}
+            {% if booking.price %}
+            <div class="service-row total-row">
+                <span>Service Price:</span>
+                <span>KSh {{ booking.price }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if booking.payment_method or booking.mpesa_transaction_id %}
+        <div class="service-details" style="margin-top: 20px;">
+            <h3>PAYMENT INFORMATION</h3>
+            <div class="service-row">
+                <span>Payment Method:</span>
+                <span>
+                    {% if booking.payment_method == 'mpesa' %}
+                        M-Pesa Mobile Money
+                    {% elif booking.payment_method == 'cash' %}
+                        Cash Payment
+                    {% else %}
+                        {{ booking.payment_method|title }}
+                    {% endif %}
+                </span>
+            </div>
+            {% if booking.payment_date %}
+            <div class="service-row">
+                <span>Payment Date:</span>
+                <span>{{ booking.payment_date|date:"d M, Y H:i" }}</span>
+            </div>
+            {% endif %}
+            {% if booking.mpesa_transaction_id %}
+            <div class="service-row">
+                <span>M-Pesa Transaction ID:</span>
+                <span>{{ booking.mpesa_transaction_id }}</span>
+            </div>
+            {% endif %}
+            {% if booking.mpesa_phone %}
+            <div class="service-row">
+                <span>M-Pesa Phone:</span>
+                <span>{{ booking.mpesa_phone }}</span>
+            </div>
+            {% endif %}
+            {% if booking.mpesa_amount %}
+            <div class="service-row">
+                <span>Amount Paid:</span>
+                <span>KSh {{ booking.mpesa_amount }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p><strong>Thank you for choosing {{ garage_info.name }}!</strong></p>
+            <p>This receipt serves as proof of service booking</p>
+            <p>For inquiries, please contact: {{ garage_info.phone }}</p>
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">Print Receipt</button>
+        <br><br>
+        <a href="{% url 'staff_dashboard' %}" style="color: #800000; text-decoration: none;">Back to Dashboard</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Auto-print dialog
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

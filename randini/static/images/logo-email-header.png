@@ -1,0 +1,14 @@
+<!-- This would be a base64 encoded PNG for email headers -->
+<!-- For now, creating a placeholder with CSS styling -->
+<div style="width: 600px; height: 100px; background: linear-gradient(135deg, #800000, #600000); border-radius: 8px; display: flex; align-items: center; padding: 20px; box-sizing: border-box;">
+  <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
+    <div style="width: 40px; height: 40px; background: #ffc107; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+      <span style="font-size: 20px; font-weight: bold; color: #800000;">R</span>
+    </div>
+  </div>
+  <div>
+    <div style="color: white; font-size: 28px; font-weight: 900; font-family: Arial Black, Arial Bold, sans-serif;">RANDINI</div>
+    <div style="color: #ffc107; font-size: 20px; font-weight: 900; font-family: Arial Black, Arial Bold, sans-serif;">AutoGarage</div>
+    <div style="color: rgba(255,255,255,0.8); font-size: 12px; font-family: Arial, sans-serif;">Expert Auto Care Since 2005 | +254 711 962 088</div>
+  </div>
+</div>

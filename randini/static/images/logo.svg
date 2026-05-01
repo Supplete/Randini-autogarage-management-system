@@ -1,0 +1,43 @@
+<svg width="300" height="80" viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with subtle gradient -->
+  <defs>
+    <linearGradient id="maroonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#800000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#600000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffb300;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Logo Container -->
+  <rect width="300" height="80" rx="8" fill="url(#maroonGradient)" />
+  
+  <!-- Wrench Icon -->
+  <g transform="translate(15, 15)">
+    <!-- Wrench Tool -->
+    <path d="M15 8 L15 2 L17 0 L22 5 L20 7 L14 13 L12 11 L8 15 L6 13 L10 9 L12 11 L18 5 L15 8 Z" 
+          fill="url(#goldGradient)" />
+    <!-- Gear Circle -->
+    <circle cx="12" cy="12" r="10" fill="none" stroke="url(#goldGradient)" stroke-width="1.5" />
+    <!-- Gear Teeth -->
+    <path d="M12 2 L13 4 L15 3 L16 5 L18 4 L18 6 L20 7 L19 9 L20 11 L18 12 L18 14 L16 15 L15 17 L13 16 L12 18 L11 16 L9 17 L8 15 L6 14 L6 12 L4 11 L5 9 L4 7 L6 6 L6 4 L8 3 L9 5 L11 4 Z" 
+          fill="url(#goldGradient)" />
+  </g>
+  
+  <!-- Brand Name -->
+  <text x="45" y="35" font-family="Arial Black, Arial Bold, sans-serif" font-size="24" font-weight="900" fill="white">
+    RANDINI
+  </text>
+  
+  <!-- AutoGarage with Gold -->
+  <text x="45" y="55" font-family="Arial Black, Arial Bold, sans-serif" font-size="18" font-weight="900" fill="url(#goldGradient)">
+    AutoGarage
+  </text>
+  
+  <!-- Tagline -->
+  <text x="45" y="70" font-family="Arial, sans-serif" font-size="8" font-weight="400" fill="rgba(255,255,255,0.8)">
+    Expert Auto Care Since 2005
+  </text>
+</svg>

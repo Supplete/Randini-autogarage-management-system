@@ -1,0 +1,223 @@
+/* ============================================================
+   RANDINI AUTOGARAGE LOGO BRANDING GUIDELINES
+   ============================================================ */
+
+/* Primary Logo Variants */
+.logo-main {
+    width: 300px;
+    height: 80px;
+    background-image: url('/static/images/logo.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.logo-horizontal {
+    width: 400px;
+    height: 60px;
+    background-image: url('/static/images/logo-horizontal.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.logo-icon {
+    width: 60px;
+    height: 60px;
+    background-image: url('/static/images/logo-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Email Header Logo */
+.email-header-logo {
+    width: 600px;
+    height: 100px;
+    background: linear-gradient(135deg, #800000, #600000);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.email-logo-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.email-logo-icon-inner {
+    width: 40px;
+    height: 40px;
+    background: #ffc107;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.email-logo-text {
+    color: white;
+}
+
+.email-logo-brand {
+    font-size: 28px;
+    font-weight: 900;
+    font-family: Arial Black, Arial Bold, sans-serif;
+    line-height: 1;
+}
+
+.email-logo-subbrand {
+    font-size: 20px;
+    font-weight: 900;
+    font-family: Arial Black, Arial Bold, sans-serif;
+    color: #ffc107;
+    line-height: 1;
+}
+
+.email-logo-tagline {
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+    color: rgba(255,255,255,0.8);
+    margin-top: 4px;
+}
+
+/* Receipt Logo */
+.receipt-logo {
+    width: 200px;
+    height: 53px;
+    background-image: url('/static/images/logo-horizontal.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto 20px;
+}
+
+/* Favicon */
+.favicon {
+    width: 32px;
+    height: 32px;
+    background-image: url('/static/images/logo-icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Watermark for documents */
+.watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    width: 400px;
+    height: 400px;
+    background-image: url('/static/images/logo.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Brand Colors */
+.brand-maroon {
+    color: #800000 !important;
+}
+
+.brand-gold {
+    color: #ffc107 !important;
+}
+
+.brand-maroon-bg {
+    background-color: #800000 !important;
+}
+
+.brand-gold-bg {
+    background-color: #ffc107 !important;
+}
+
+/* Typography */
+.brand-font {
+    font-family: 'Arial Black', 'Arial Bold', sans-serif;
+    font-weight: 900;
+}
+
+.brand-subfont {
+    font-family: Arial, sans-serif;
+    font-weight: 400;
+}
+
+/* Responsive Logo Sizes */
+@media (max-width: 768px) {
+    .logo-main {
+        width: 250px;
+        height: 67px;
+    }
+    
+    .logo-horizontal {
+        width: 300px;
+        height: 45px;
+    }
+    
+    .email-header-logo {
+        width: 100%;
+        max-width: 500px;
+        height: 80px;
+    }
+    
+    .email-logo-brand {
+        font-size: 22px;
+    }
+    
+    .email-logo-subbrand {
+        font-size: 16px;
+    }
+    
+    .receipt-logo {
+        width: 150px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-horizontal {
+        width: 250px;
+        height: 38px;
+    }
+    
+    .email-header-logo {
+        height: 70px;
+        padding: 15px;
+    }
+    
+    .email-logo-icon {
+        width: 50px;
+        height: 50px;
+        margin-right: 15px;
+    }
+    
+    .email-logo-icon-inner {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .email-logo-brand {
+        font-size: 18px;
+    }
+    
+    .email-logo-subbrand {
+        font-size: 14px;
+    }
+    
+    .email-logo-tagline {
+        font-size: 10px;
+    }
+}

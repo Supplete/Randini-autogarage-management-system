@@ -1,71 +1,73 @@
 {% extends 'staff/admin_base.html' %}
-{% block title %}Manage Orders | Staff{% endblock %}
+{% block title %}Orders | Randini Garage{% endblock %}
+{% block page_title %}Customer Orders{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 mb-0 fw-bold" style="color: var(--maroon);">Garage Orders</h2>
-        <span class="badge bg-dark fs-6">{{ orders.count }} Total</span>
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-white border-0 py-3 px-4">
+    <h6 class="fw-bold mb-0"><i class="bi bi-bag-check-fill me-2" style="color:#800000;"></i>All Spare Part Orders</h6>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table data-table mb-0">
+         <thead>
+           <tr><th>#</th><th>Image</th><th>Customer</th><th>Payment</th><th>Amount</th><th>Status</th><th>Date</th><th class="text-end pe-4">Action</th></tr>
+         </thead>
+        <tbody>
+          {% for order in orders %}
+           <tr>
+             <td class="fw-bold text-muted">#{{ order.id }}</td>
+             <td>
+               {% if order.items.first.product.image %}
+                 <img src="{{ order.items.first.product.image.url }}" alt="Product" class="rounded" style="width:50px; height:50px; object-fit:cover;">
+               {% else %}
+                 <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+                   <i class="bi bi-image text-muted"></i>
+                 </div>
+               {% endif %}
+             </td>
+             <td>
+               <div class="fw-semibold">{{ order.full_name }}</div>
+               <div class="small text-muted">{{ order.phone_number }}</div>
+               <div class="small text-muted">{{ order.email }}</div>
+               <div class="small text-muted">{{ order.address }}, {{ order.city }}</div>
+             </td>
+            <td>
+              {% if order.payment_method == 'mpesa' %}
+                <span class="badge bg-info text-dark"><i class="bi bi-phone me-1"></i>M-Pesa</span>
+              {% else %}
+                <span class="badge bg-secondary"><i class="bi bi-cash me-1"></i>Cash</span>
+              {% endif %}
+            </td>
+            <td class="fw-bold">KSh {{ order.total_amount }}</td>
+            <td>
+              {% if order.status == 'Completed' %}
+                <span class="badge bg-success px-3">Completed</span>
+                {% if order.transaction_id %}
+                  <div class="small text-muted mt-1">Ref: {{ order.transaction_id }}</div>
+                {% endif %}
+              {% elif order.status == 'Failed' %}
+                <span class="badge bg-danger px-3">Failed</span>
+              {% else %}
+                <span class="badge bg-warning text-dark px-3">Pending</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted">{{ order.created_at|date:"d M, g:i a" }}</td>
+             <td class="text-end pe-4">
+               <a href="{% url 'staff_order_detail' order.id %}" class="btn btn-sm btn-outline-dark rounded-pill me-1">
+                 <i class="bi bi-eye me-1"></i>View
+               </a>
+               <a href="{% url 'print_order_receipt' order.id %}" class="btn btn-sm btn-outline-primary rounded-pill" target="_blank">
+                 <i class="bi bi-printer me-1"></i>Print Receipt
+               </a>
+             </td>
+          </tr>
+           {% empty %}
+           <tr><td colspan="8" class="text-center py-5 text-muted">No orders found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">ID</th>
-                            <th>Customer</th>
-                            <th>Payment</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td class="ps-4 fw-bold">#{{ order.id }}</td>
-                            <td>
-                                <div class="d-flex flex-column">
-                                    <span class="fw-semibold">{{ order.full_name }}</span>
-                                    <small class="text-muted">{{ order.phone }}</small>
-                                </div>
-                            </td>
-                            <td>
-                                {% if order.payment_method == 'mpesa' %}
-                                    <span class="badge bg-info text-dark"><i class="bi bi-phone"></i> M-Pesa</span>
-                                {% else %}
-                                    <span class="badge bg-secondary"><i class="bi bi-cash"></i> Cash</span>
-                                {% endif %}
-                            </td>
-                            <td class="fw-bold text-dark">KES {{ order.total_amount }}</td>
-                            <td>
-                                {% if order.status == 'Completed' %}
-                                    <span class="badge bg-success-soft text-success border border-success px-3">Paid</span>
-                                {% elif order.status == 'Pending' %}
-                                    <span class="badge bg-warning-soft text-warning border border-warning px-3">Pending</span>
-                                {% else %}
-                                    <span class="badge bg-danger-soft text-danger border border-danger px-3">Failed</span>
-                                {% endif %}
-                            </td>
-                            <td class="small">{{ order.created_at|date:"d M, g:i a" }}</td>
-                            <td class="text-end pe-4">
-                                <a href="{% url 'staff_order_detail' order.id %}" class="btn btn-sm btn-outline-dark">
-                                    <i class="bi bi-eye"></i> View
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">No orders found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 {% endblock %}

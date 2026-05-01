@@ -1,70 +1,162 @@
+<!-- Services Page Template -->
+<!-- Extends base.html for consistent layout and navigation -->
 {% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
 
-<!-- SERVICES CARDS SECTION -->
+<!-- Custom Styles for Service Cards -->
+<style>
+  :root {
+    --maroon: #800000;
+    --gold: #ffc107;
+  }
+
+  .service-card {
+    background: linear-gradient(135deg, #800000 0%, #600000 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(128, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(128, 0, 0, 0.4);
+    color: white;
+  }
+
+  .service-card h5 {
+    color: #ffc107;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .service-card .description {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+
+  .service-icon {
+    font-size: 3.5rem;
+    color: #ffc107;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .vehicle-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+
+  .border-white-50 {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .services-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .services-grid > div {
+    margin-bottom: 1.5rem;
+  }
+</style>
+
+<!-- Services Cards Section -->
 <section class="py-5">
     <div class="container">
+        <!-- Section Header -->
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Our Core Services</h2>
-            <p class="text-muted">Professional solutions for every vehicle need</p>
+            <h2 class="fw-bold">Our Services</h2>
+            <p class="text-muted">Professional automotive solutions for every vehicle need</p>
         </div>
 
-        <div class="row g-4">
+        <!-- Services Grid - 3 columns with proper spacing -->
+        <div class="row" style="--bs-gutter-x: 1.5rem; --bs-gutter-y: 1.5rem;">
+            {% for service in services %}
             <div class="col-md-4">
-                <div class="card custom-card h-100 text-center p-4">
-                    <h5 class="fw-bold">Vehicle Diagnostics</h5>
-                    <p>
-                        Advanced diagnostics to quickly identify and troubleshoot issues.
-                    </p>
-                </div>
-            </div>
+                <div class="card service-card h-100 text-center p-4">
+                    <!-- Service Icon based on service type -->
+                    {% if service.service_type == 'engine' %}
+                        <i class="bi bi-gear service-icon"></i>
+                    {% elif service.service_type == 'body' %}
+                        <i class="bi bi-car-front service-icon"></i>
+                    {% elif service.service_type == 'painting' %}
+                        <i class="bi bi-palette service-icon"></i>
+                    {% elif service.service_type == 'oil' %}
+                        <i class="bi bi-droplet service-icon"></i>
+                    {% elif service.service_type == 'diagnostic' %}
+                        <i class="bi bi-search service-icon"></i>
+                    {% else %}
+                        <i class="bi bi-tools service-icon"></i>
+                    {% endif %}
 
-            <div class="col-md-4">
-                <div class="card custom-card h-100 text-center p-4">
-                    <h5 class="fw-bold">Mechanical Repairs</h5>
-                    <p>
-                        Engine, brakes, suspension, and all mechanical repairs handled by certified technicians.
-                    </p>
-                </div>
-            </div>
+                    <h5 class="fw-bold">{{ service.get_service_type_display }}</h5>
 
-            <div class="col-md-4">
-                <div class="card custom-card h-100 text-center p-4">
-                    <h5 class="fw-bold">Electrical Systems</h5>
-                    <p>
-                        Battery, wiring, and all electrical components inspected and repaired.
-                    </p>
-                </div>
-            </div>
+                    <!-- Vehicle Type Badge -->
+                    <span class="vehicle-badge">
+                        <i class="bi bi-car-front me-1"></i>{{ service.get_vehicle_type_display }}
+                    </span>
 
-            <div class="col-md-4">
-                <div class="card custom-card h-100 text-center p-4">
-                    <h5 class="fw-bold">Genuine Spare Parts</h5>
-                    <p>
-                        We supply high-quality, reliable spare parts for all vehicle makes and models.
+                    <!-- Description -->
+                    <p class="description mt-3">
+                        {{ service.description|default:"Professional service for your vehicle" }}
                     </p>
-                </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="card custom-card h-100 text-center p-4">
-                    <h5 class="fw-bold">Preventive Maintenance</h5>
-                    <p>
-                        Regular servicing to extend the life of your car and prevent breakdowns.
-                    </p>
+                    <!-- Price -->
+                    <div class="mt-3 pt-3 border-top border-white-50">
+                        <span class="fw-bold">From KSh {{ service.base_price }}</span>
+                    </div>
                 </div>
             </div>
-
+            {% empty %}
+            <!-- Fallback if no services in database -->
             <div class="col-md-4">
-                <div class="card custom-card h-100 text-center p-4">
-                    <h5 class="fw-bold">Car AC & Cooling</h5>
-                    <p>
-                        Ensure your AC and cooling systems work efficiently, keeping you comfortable on the road.
-                    </p>
+                <div class="card service-card h-100 text-center p-4">
+                    <i class="bi bi-search service-icon"></i>
+                    <h5 class="fw-bold">Diagnostics</h5>
+                    <span class="vehicle-badge"><i class="bi bi-car-front me-1"></i>All Vehicles</span>
+                    <p class="description mt-3">Accurate fault detection using modern diagnostic tools.</p>
+                    <div class="mt-3 pt-3 border-top border-white-50">
+                        <span class="fw-bold">From KSh 5,000</span>
+                    </div>
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="card service-card h-100 text-center p-4">
+                    <i class="bi bi-tools service-icon"></i>
+                    <h5 class="fw-bold">Repairs</h5>
+                    <span class="vehicle-badge"><i class="bi bi-car-front me-1"></i>All Vehicles</span>
+                    <p class="description mt-3">Engine, electrical & mechanical repairs by certified mechanics.</p>
+                    <div class="mt-3 pt-3 border-top border-white-50">
+                        <span class="fw-bold">From KSh 15,000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card service-card h-100 text-center p-4">
+                    <i class="bi bi-gear-fill service-icon"></i>
+                    <h5 class="fw-bold">Spare Parts</h5>
+                    <span class="vehicle-badge"><i class="bi bi-car-front me-1"></i>All Vehicles</span>
+                    <p class="description mt-3">High-quality genuine spare parts for all vehicle makes.</p>
+                    <div class="mt-3 pt-3 border-top border-white-50">
+                        <span class="fw-bold">From KSh 500</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>

@@ -1,73 +1,146 @@
 {% extends 'staff/admin_base.html' %}
+{% block title %}Analytics | Randini Garage{% endblock %}
+{% block page_title %}Business Analytics{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-        <h2 class="fw-bold">Business Analytics</h2>
-        <button onclick="window.print()" class="btn btn-dark">
-            <i class="bi bi-file-earmark-pdf me-2"></i>Export as PDF / Print
-        </a>
-    </div>
 
-    <div class="print-only text-center mb-5">
-        <h1 class="fw-bold">RANDINI AUTO GARAGE</h1>
-        <h4 class="text-uppercase border-bottom pb-2">Monthly Performance Report</h4>
-        <p>Generated on: {{ report_date|date:"F d, Y" }}</p>
-    </div>
+<!-- Report Controls -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
+  <div class="card-body">
+    <form method="GET" class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label fw-bold">Report Period</label>
+        <select name="period" class="form-select" onchange="this.form.submit()">
+          <option value="today" {% if period == 'today' %}selected{% endif %}>Today</option>
+          <option value="daily" {% if period == 'daily' %}selected{% endif %}>Daily (Last 7 Days)</option>
+          <option value="monthly" {% if period == 'monthly' %}selected{% endif %}>Monthly (Last 30 Days)</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label fw-bold">&nbsp;</label>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-arrow-clockwise me-1"></i>Generate Report
+          </button>
+          <button type="button" onclick="window.print()" class="btn btn-outline-dark">
+            <i class="bi bi-printer me-1"></i>Print
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-6 col-print-6">
-            <div class="card border shadow-sm p-3">
-                <h6 class="text-muted small">Total Revenue (All Time)</h6>
-                <h3 class="fw-bold text-success">KSh {{ total_revenue|floatformat:0 }}</h3>
-            </div>
-        </div>
-        <div class="col-md-6 col-print-6">
-            <div class="card border shadow-sm p-3">
-                <h6 class="text-muted small">Total Service Bookings</h6>
-                <h3 class="fw-bold text-primary">{{ total_bookings }}</h3>
-            </div>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4 no-print">
+  <p class="text-muted mb-0">
+    {% if period == 'today' %}Today's Performance Overview{% endif %}
+    {% if period == 'daily' %}Daily Performance Overview — Last 7 Days{% endif %}
+    {% if period == 'monthly' %}Monthly Performance Overview — Last 30 Days{% endif %}
+  </p>
+</div>
 
-    <div class="row g-4">
-        <div class="col-lg-8 col-print-12">
-            <div class="card border shadow-sm p-4">
-                <h5 class="fw-bold mb-4">Daily Sales Trend</h5>
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
-        <div class="col-lg-4 col-print-12">
-            <div class="card border shadow-sm p-4">
-                <h5 class="fw-bold mb-4">Most Popular Parts</h5>
-                <canvas id="partsChart"></canvas>
-            </div>
-        </div>
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100" style="border-left:5px solid #28a745 !important;">
+      <div class="card-body">
+        <h6 class="text-uppercase text-muted small fw-bold">Total Verified Revenue</h6>
+        <h2 class="fw-bold text-success mb-1">KSh {{ total_revenue|floatformat:0 }}</h2>
+        <p class="small text-muted mb-0"><i class="bi bi-shield-check me-1"></i>From completed M-Pesa & cash orders only</p>
+      </div>
     </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100" style="border-left:5px solid #800000 !important;">
+      <div class="card-body">
+        <h6 class="text-uppercase text-muted small fw-bold">Total Bookings</h6>
+        <h2 class="fw-bold mb-1" style="color:#800000;">{{ total_bookings }}</h2>
+        <p class="small text-muted mb-0"><i class="bi bi-calendar2-check me-1"></i>All-time service appointments</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-0 py-3 px-4">
+        <h6 class="fw-bold mb-0">
+          <i class="bi bi-graph-up-arrow me-2" style="color:#800000;"></i>
+          {% if period == 'today' %}Today's Sales Trend{% endif %}
+          {% if period == 'daily' %}Daily Sales Trend — Last 7 Days{% endif %}
+          {% if period == 'monthly' %}Monthly Sales Trend — Last 30 Days{% endif %}
+        </h6>
+      </div>
+      <div class="card-body">
+        <div style="height:300px;"><canvas id="salesChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-0 py-3 px-4">
+        <h6 class="fw-bold mb-0"><i class="bi bi-pie-chart-fill me-2" style="color:#800000;"></i>Most Popular Parts</h6>
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center">
+        <div style="max-width:260px;width:100%;"><canvas id="partsChart"></canvas></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-    /* 1. Hide print-only elements on the screen */
-    .print-only { display: none; }
-
-    @media print {
-        /* 2. Show print-only elements and hide UI buttons/nav */
-        .no-print, .btn, .navbar, .sidebar { display: none !important; }
-        .print-only { display: block !important; }
-        
-        /* 3. Force layout to fit on a sheet of A4 paper */
-        body { background: white !important; font-size: 12pt; }
-        .card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 20px; }
-        .col-print-6 { width: 50%; float: left; }
-        .col-print-12 { width: 100%; }
-        
-        /* 4. Ensure Charts show up in the print */
-        canvas { max-width: 100% !important; height: auto !important; }
-    }
+  @media print {
+    .no-print,.sidebar,.topbar { display:none !important; }
+    .main-content { margin-left:0 !important; }
+    .card { box-shadow:none !important; border:1px solid #ddd !important; }
+  }
 </style>
+{% endblock %}
 
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // ... (Your Chart.js code from the previous response) ...
+new Chart(document.getElementById('salesChart'), {
+  type: 'line',
+  data: {
+    labels: {{ days|safe }},
+    datasets: [{
+      label: 'Revenue (KSh)',
+      data: {{ revenue_data|safe }},
+      borderColor: '#800000',
+      backgroundColor: 'rgba(128,0,0,0.07)',
+      fill: true, tension: 0.4, borderWidth: 2.5,
+      pointBackgroundColor: '#ffc107', pointRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: '#f4f4f4' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+new Chart(document.getElementById('partsChart'), {
+  type: 'doughnut',
+  data: {
+    labels: {{ part_labels|safe }},
+    datasets: [{
+      data: {{ part_counts|safe }},
+      backgroundColor: ['#800000','#ffc107','#212529','#6c757d','#adb5bd'],
+      hoverOffset: 10, borderWidth: 2, borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } }
+    },
+    cutout: '68%'
+  }
+});
 </script>
 {% endblock %}

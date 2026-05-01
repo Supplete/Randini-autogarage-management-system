@@ -1,0 +1,129 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Edit Staff | Randini Garage{% endblock %}
+{% block page_title %}Edit Staff Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold small">First Name</label>
+              <input type="text" name="first_name" class="form-control" value="{{ staff_user.first_name }}" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small">Last Name</label>
+              <input type="text" name="last_name" class="form-control" value="{{ staff_user.last_name }}" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">Email Address</label>
+              <input type="email" name="email" class="form-control" value="{{ staff_user.email }}" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">Role</label>
+              <select name="role" class="form-select">
+                {% for val, label in profile.ROLE_CHOICES %}
+                  <option value="{{ val }}" {% if profile.role == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">Bio</label>
+              <textarea name="bio" class="form-control" rows="2">{{ profile.bio }}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold small">Profile Photo</label>
+              <input type="file" name="photo" id="photo-input" class="form-control" accept="image/*">
+              <div id="photo-preview" class="mt-2">
+                {% if profile.photo %}
+                  <img src="{{ profile.photo.url }}" width="60" class="rounded-circle" id="current-photo">
+                  <small class="text-muted d-block mt-1">Current photo</small>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn fw-bold px-4" style="background:#800000;color:#fff;">
+              <i class="bi bi-save-fill me-1"></i> Save Changes
+            </button>
+            <a href="{% url 'manage_staff' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Image preview functionality
+document.getElementById('photo-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  const previewDiv = document.getElementById('photo-preview');
+
+  if (file) {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file.');
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB.');
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      // Hide current photo if exists
+      const currentPhoto = document.getElementById('current-photo');
+      if (currentPhoto) {
+        currentPhoto.style.display = 'none';
+      }
+
+      // Remove existing preview
+      const existingPreview = document.getElementById('new-photo-preview');
+      if (existingPreview) {
+        existingPreview.remove();
+      }
+
+      // Create new preview
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.width = 80;
+      img.className = 'rounded-circle';
+      img.id = 'new-photo-preview';
+
+      const label = document.createElement('small');
+      label.className = 'text-success d-block mt-1 fw-semibold';
+      label.textContent = 'New photo selected';
+
+      previewDiv.appendChild(img);
+      previewDiv.appendChild(label);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // Reset to show current photo
+    const currentPhoto = document.getElementById('current-photo');
+    if (currentPhoto) {
+      currentPhoto.style.display = 'block';
+    }
+
+    // Remove new preview
+    const existingPreview = document.getElementById('new-photo-preview');
+    if (existingPreview) {
+      existingPreview.remove();
+    }
+
+    // Remove success label
+    const labels = previewDiv.querySelectorAll('.text-success');
+    labels.forEach(label => label.remove());
+  }
+});
+</script>
+{% endblock %}

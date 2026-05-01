@@ -1,0 +1,144 @@
+{% extends 'staff/admin_base.html' %}
+{% load static %}
+{% block title %}Add Customer | Randini Garage{% endblock %}
+
+{% block content %}
+<style>
+    .btn { font-size: 1rem; font-weight: 500; }
+    .table { font-size: 1rem; }
+    .badge { font-size: 0.9rem; padding: 6px 12px; }
+    .text-muted { font-size: 0.95rem; }
+    
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .form-header h2 {
+        color: #800000;
+        margin-bottom: 10px;
+    }
+    
+    .form-header p {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+    
+    .info-box {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .info-box h4 {
+        color: #004085;
+        margin-bottom: 10px;
+    }
+    
+    .info-box p {
+        color: #0056b3;
+        margin: 0 0 10px 0;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 0.95rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.15rem rgba(128,0,0,0.1);
+        outline: none;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: #800000;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        background: #600000;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><i class="bi bi-person-plus-fill me-2"></i>Add New Customer</h2>
+                    <p>Create a new customer account</p>
+                </div>
+                
+                <div class="info-box">
+                    <h4><i class="bi bi-info-circle me-2"></i>Important Information</h4>
+                    <p><strong>Temporary Password:</strong> The account will be created with password "Customer@123". You can inform the customer and they can change it later.</p>
+                    <p><strong>Account Activation:</strong> The account will be created as active by default. You can deactivate/activate customers using the toggle button in the customer list.</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" name="first_name" class="form-control" placeholder="Enter first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name *</label>
+                        <input type="text" name="last_name" class="form-control" placeholder="Enter last name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" name="email" class="form-control" placeholder="customer@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" name="phone_number" class="form-control" placeholder="+254 XXX XXX XXX" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-person-check me-2"></i>Create Customer Account
+                    </button>
+                    
+                    <a href="{% url 'staff_customers' %}" class="text-muted">← Back to Customers</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

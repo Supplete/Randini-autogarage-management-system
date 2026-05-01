@@ -1,126 +1,223 @@
 {% extends 'staff/admin_base.html' %}
-{% block title %}Bookings Management | Randini Garage{% endblock %}
-
-{% block extra_css %}
-<style>
-    :root {
-        --maroon: #800000;
-        --charcoal: #333333;
-    }
-    .card-header-custom {
-        background-color: var(--maroon);
-        color: white;
-        border-top-left-radius: 15px !important;
-        border-top-right-radius: 15px !important;
-    }
-    .expense-input {
-        width: 100px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 2px 8px;
-        font-weight: bold;
-    }
-    .status-badge {
-        font-size: 0.75rem;
-        padding: 5px 10px;
-        border-radius: 20px;
-        display: inline-block;
-        margin-bottom: 5px;
-        width: 100%;
-        text-align: center;
-        border: none;
-        transition: 0.3s;
-    }
-    .btn-pending { background-color: #fff3cd; color: #856404; }
-    .btn-active { background-color: #cce5ff; color: #004085; }
-    .btn-done { background-color: #d4edda; color: #155724; }
-    
-    .status-badge:hover { filter: brightness(0.9); cursor: pointer; }
-    
-    .btn-email { background-color: #6c757d; color: white; }
-    .btn-email:hover { background-color: #5a6268; color: white; }
-</style>
-{% endblock %}
+{% block title %}Bookings | Randini Garage{% endblock %}
+{% block page_title %}Service Bookings{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-lg border-0" style="border-radius: 15px;">
-                <div class="card-header card-header-custom py-3 d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 fw-bold"><i class="fas fa-tools me-2"></i>CLIENT SERVICE MANAGEMENT</h4>
-                    <span class="badge bg-light text-dark p-2">Total Revenue: Ksh {{ total_revenue }}</span>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
-                            <thead class="table-light">
-                                <tr class="text-secondary small text-uppercase">
-                                    <th class="ps-4">Customer & Vehicle</th>
-                                    <th>Service Details</th>
-                                    <th>Expenses (KSH)</th>
-                                    <th class="text-center">Work Status</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for b in bookings %}
-                                <tr>
-                                    <td class="ps-4">
-                                        <h6 class="mb-0 fw-bold" style="color: var(--charcoal);">{{ b.full_name }}</h6>
-                                        <small class="text-muted"><i class="fas fa-car me-1"></i>{{ b.vehicle_type }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-outline-secondary border text-dark">{{ b.service_type }}</span>
-                                    </td>
-                                    <td>
-                                        <form method="POST" class="d-flex flex-column gap-2 py-2">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="booking_id" value="{{ b.id }}">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text">Ksh</span>
-                                                <input type="number" name="price" class="form-control fw-bold" value="{{ b.price }}">
-                                            </div>
-                                    </td>
-                                    <td style="width: 160px;">
-                                            <button type="submit" name="set_pending" class="status-badge btn-pending">Pending Quote</button>
-                                            <button type="submit" name="set_inprogress" class="status-badge btn-active">In Progress</button>
-                                            <button type="submit" name="set_completed" class="status-badge btn-done">Mark Done</button>
-                                        </form>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group gap-1">
-                                            <form method="POST"> {% csrf_token %}
-                                                <input type="hidden" name="booking_id" value="{{ b.id }}">
-                                                <button type="submit" name="send_email" class="btn btn-email btn-sm shadow-sm">
-                                                    <i class="fas fa-paper-plane"></i>
-                                                </button>
-                                            </form>
-                                            
-                                            <a href="{% url 'print_receipt' b.id %}" target="_blank" class="btn btn-dark btn-sm shadow-sm">
-                                                <i class="fas fa-print"></i>
-                                            </a>
+<!-- Force button visibility -->
+<style>
+.btn-sm {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: 1000 !important;
+    min-width: 35px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+    margin: 1px !important;
+}
+/* Ensure delete button is visible */
+.btn-sm[title="Delete"] {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #dc3545 !important;
+    color: white !important;
+    border: 1px solid #dc3545 !important;
+}
+</style>
+<!-- SweetAlert for booking actions -->
+<script>
+function updateBookingStatus(action, bookingId) {
+    const messages = {
+        'set_pending': 'Set booking #' + bookingId + ' to Pending?',
+        'set_inprogress': 'Set booking #' + bookingId + ' to In Progress?',
+        'set_completed': 'Complete booking #' + bookingId + '?',
+        'delete_booking': 'Delete Booking #' + bookingId + '?'
+    };
+    
+    SweetAlertUtils.confirm(
+        'Confirm Action',
+        messages[action],
+        'Yes, do it',
+        'Cancel',
+        function() {
+            // Show loading
+            SweetAlertUtils.loading('Processing...', 'Please wait...');
+            
+            // Submit the form
+            const form = document.querySelector('form input[name="booking_id"][value="' + bookingId + '"]').closest('form');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = action;
+            input.value = '1';
+            form.appendChild(input);
+            form.submit();
+        }
+    );
+}
 
-                                            <form method="POST" onsubmit="return confirm('Delete this booking?');"> {% csrf_token %}
-                                                <input type="hidden" name="booking_id" value="{{ b.id }}">
-                                                <button type="submit" name="delete_booking" class="btn btn-outline-danger btn-sm">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">No garage bookings found today.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+// Handle success messages
+document.addEventListener('DOMContentLoaded', function() {
+    // Debug: Check if SweetAlertUtils is available
+    console.log('SweetAlertUtils available:', typeof SweetAlertUtils !== 'undefined');
+    
+    // Debug: Check if buttons exist
+    const buttons = document.querySelectorAll('button[onclick*="updateBookingStatus"]');
+    console.log('Action buttons found:', buttons.length);
+    
+    const alerts = document.querySelectorAll('.alert-success');
+    alerts.forEach(function(alert) {
+        const message = alert.textContent.trim();
+        if (message.includes('completed')) {
+            SweetAlertUtils.success('Booking Completed', message);
+            alert.style.display = 'none';
+        } else if (message.includes('set to')) {
+            SweetAlertUtils.info('Status Updated', message);
+            alert.style.display = 'none';
+        }
+    });
+    
+    const errorAlerts = document.querySelectorAll('.alert-danger');
+    errorAlerts.forEach(function(alert) {
+        const message = alert.textContent.trim();
+        if (message) {
+            SweetAlertUtils.error('Action Failed', message);
+            alert.style.display = 'none';
+        }
+    });
+});
+</script>
+<!-- Summary strip -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <div class="card border-0 shadow-sm rounded-3 py-3 text-center">
+      <h5 class="fw-bold text-warning mb-0">{{ bookings|length }}</h5>
+      <p class="text-muted small mb-0">Total Bookings</p>
     </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card border-0 shadow-sm rounded-3 py-3 text-center">
+      <h5 class="fw-bold text-success mb-0">KSh {{ total_revenue|floatformat:0 }}</h5>
+      <p class="text-muted small mb-0">Total Revenue (Completed)</p>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card border-0 shadow-sm rounded-3 py-3 text-center">
+      <h5 class="fw-bold mb-0" style="color:#800000;">
+        {{ bookings|length }}
+      </h5>
+      <p class="text-muted small mb-0">Bookings This Period</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-0 py-3 px-4">
+        <h6 class="fw-bold mb-0"><i class="bi bi-lightning-fill me-2" style="color:#800000;"></i>Quick Actions</h6>
+      </div>
+      <div class="card-body p-4">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-clock-history text-warning fs-2 mb-2"></i>
+              <h6 class="fw-bold">Track Status</h6>
+              <p class="text-muted small">Update booking status from Pending to In Progress to Complete</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-cash-stack text-success fs-2 mb-2"></i>
+              <h6 class="fw-bold">Manage Pricing</h6>
+              <p class="text-muted small">Set prices for services and generate invoices</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-printer text-secondary fs-2 mb-2"></i>
+              <h6 class="fw-bold">Print Receipts</h6>
+              <p class="text-muted small">Generate professional receipts for customers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-white border-0 py-3 px-4">
+    <h6 class="fw-bold mb-0"><i class="bi bi-calendar2-check-fill me-2" style="color:#800000;"></i>All Service Bookings</h6>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table data-table mb-0">
+        <thead>
+          <tr>
+            <th>#</th><th>Customer</th><th>Vehicle</th><th>Service</th>
+            <th>Preferred Time</th><th>Status</th><th>Price (KSh)</th><th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td class="fw-bold text-muted">#{{ booking.id }}</td>
+            <td>
+              <div class="fw-semibold">{{ booking.full_name }}</div>
+              <div class="small text-muted">{{ booking.phone }}</div>
+            </td>
+            <td>{{ booking.get_vehicle_type_display }}</td>
+            <td>{{ booking.get_service_type_display }}</td>
+            <td class="small text-muted">{{ booking.preferred_time|date:"d M Y, H:i" }}</td>
+            <td>
+              {% if booking.status == 'Completed' %}<span class="badge bg-success rounded-pill">Completed</span>
+              {% elif booking.status == 'In Progress' %}<span class="badge bg-primary rounded-pill">In Progress</span>
+              {% else %}<span class="badge bg-warning text-dark rounded-pill">Pending</span>{% endif %}
+            </td>
+            <td class="fw-bold">{{ booking.price }}</td>
+            <td>
+              <!-- Status & Price Update Form -->
+              <form method="POST" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                <div class="d-flex gap-1 flex-wrap justify-content-center">
+                  <input type="number" name="price" placeholder="Price" class="form-control form-control-sm"
+                         style="width:80px;" step="0.01" value="{{ booking.price }}">
+                  <button type="submit" name="set_pending" class="btn btn-sm" 
+                          style="min-width: 35px; font-weight: bold; background: var(--gold); color: var(--maroon); border: 1px solid var(--maroon);"
+                          onclick="return confirm('Set booking #{{ booking.id }} to Pending?')">P</button>
+                  <button type="submit" name="set_inprogress" class="btn btn-sm" title="In Progress"
+                          style="min-width: 35px; font-weight: bold; background: var(--maroon); color: white; border: 1px solid var(--maroon);"
+                          onclick="return confirm('Set booking #{{ booking.id }} to In Progress?')">IP</button>
+                  <button type="submit" name="set_completed" class="btn btn-sm" title="Complete"
+                          style="min-width: 35px; font-weight: bold; background: #28a745; color: white; border: 1px solid #28a745;"
+                          onclick="return confirm('Complete booking #{{ booking.id }}?')">✔</button>
+                  <a href="{% url 'print_receipt' booking.id %}" class="btn btn-sm" title="Print Receipt" target="_blank"
+                     style="min-width: 35px; font-weight: bold; background: #6c757d; color: white; border: 1px solid #6c757d;">
+                    <i class="bi bi-printer"></i>
+                  </a>
+                  <a href="{% url 'create_invoice_from_booking' booking.id %}" class="btn btn-sm" title="Create Invoice" target="_blank"
+                     style="min-width: 35px; font-weight: bold; background: #28a745; color: white; border: 1px solid #28a745;">
+                    <i class="bi bi-file-earmark-plus"></i>
+                  </a>
+                  <button type="submit" name="delete_booking" class="btn btn-danger btn-sm" title="Delete Booking"
+                          style="min-width: 60px !important; font-weight: bold; display: inline-block !important; visibility: visible !important; opacity: 1 !important; margin-left: 2px !important;"
+                          onclick="return confirm('Are you sure you want to DELETE Booking #{{ booking.id }}? This action CANNOT be undone!')">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </div>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-center py-5 text-muted">No bookings found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}

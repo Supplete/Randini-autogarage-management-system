@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Report - {{ garage_info.name }}</title>
+    <style>
+        @media print {
+            body { font-size: 10px; }
+            .no-print { display: none !important; }
+            .report-container { 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 15px; 
+                box-shadow: none;
+            }
+            th, td { font-size: 9px; padding: 4px; }
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .report-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header { text-align: center; border-bottom: 2px solid #800000; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { color: #800000; margin: 0; font-size: 28px; }
+        .header p { margin: 5px 0; color: #666; }
+        .report-summary { display: flex; justify-content: space-around; margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .summary-item { text-align: center; }
+        .summary-number { font-size: 24px; font-weight: bold; color: #800000; }
+        .summary-label { color: #666; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { background: #800000; color: white; text-align: left; padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+        .no-print { text-align: center; margin: 20px 0; }
+        .btn-print { background: #800000; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-print:hover { background: #600000; }
+        .customer-info { margin-bottom: 5px; }
+        .customer-email { color: #666; font-size: 0.9em; }
+        .customer-phone { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>{{ garage_info.name }}</h1>
+            <p>{{ garage_info.address }}</p>
+            <p>{{ garage_info.phone }}</p>
+            <p>{{ garage_info.email }}</p>
+        </div>
+
+        <h2 style="text-align: center; color: #800000; margin-bottom: 20px;">
+    {% if is_staff_view %}CUSTOMER REPORT{% else %}MY CUSTOMER INFORMATION{% endif %}
+</h2>
+
+        <div class="report-summary">
+            <div class="summary-item">
+                <div class="summary-number">{{ total_customers }}</div>
+                <div class="summary-label">Total Customers</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">{{ customers|length }}</div>
+                <div class="summary-label">Records Shown</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">{% now "d M Y" %}</div>
+                <div class="summary-label">Report Date</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer Name</th>
+                    <th>Email Address</th>
+                    <th>Phone Number</th>
+                    <th>Registration Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td><strong>{{ forloop.counter }}</strong></td>
+                    <td>
+                        <div class="customer-info">
+                            <strong>{{ customer.user.first_name }} {{ customer.user.last_name }}</strong>
+                        </div>
+                    </td>
+                    <td class="customer-email">{{ customer.user.email }}</td>
+                    <td class="customer-phone">{{ customer.phone_number|default:"-" }}</td>
+                    <td>{{ customer.user.date_joined|date:"d M, Y" }}</td>
+                    <td>
+                        {% if customer.user.is_active %}
+                            <span style="color: #28a745; font-weight: bold;">Active</span>
+                        {% else %}
+                            <span style="color: #dc3545; font-weight: bold;">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px;">No customers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            {% if is_staff_view %}
+            <h4 style="color: #800000; margin-bottom: 15px;">Customer Statistics</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div>
+                    <strong>New Customers (Last 30 Days):</strong>
+                    <span style="float: right; color: #800000;">
+                        {{ new_customers_count }}
+                    </span>
+                </div>
+                <div>
+                    <strong>Active Customers:</strong>
+                    <span style="float: right; color: #28a745;">
+                        {{ active_customers_count }}
+                    </span>
+                </div>
+                <div>
+                    <strong>Inactive Customers:</strong>
+                    <span style="float: right; color: #dc3545;">
+                        {{ inactive_customers_count }}
+                    </span>
+                </div>
+            </div>
+            {% else %}
+            <h4 style="color: #800000; margin-bottom: 15px;">Your Account Information</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div>
+                    <strong>Account Status:</strong>
+                    <span style="float: right; color: #28a745;">
+                        {% for customer in customers %}
+                            {% if customer.user.is_active %}Active{% else %}Inactive{% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+                <div>
+                    <strong>Member Since:</strong>
+                    <span style="float: right; color: #800000;">
+                        {% for customer in customers %}
+                            {{ customer.user.date_joined|date:"d M, Y" }}
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; color: #666; font-size: 12px;">
+            <p><strong>Report generated on:</strong> {% now "d F, Y H:i" %}</p>
+            {% if is_staff_view %}
+            <p>This is an official customer report from {{ garage_info.name }}</p>
+            {% else %}
+            <p>This is your personal customer information from {{ garage_info.name }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">Print Report</button>
+        <br><br>
+        <a href="{% url 'staff_dashboard' %}" style="color: #800000; text-decoration: none;">Back to Dashboard</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Auto-print dialog
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

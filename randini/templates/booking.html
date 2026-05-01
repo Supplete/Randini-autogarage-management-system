@@ -1,8 +1,65 @@
+<!-- Booking Page Template -->
+<!-- Extends base.html for consistent layout and navigation -->
 {% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
-<div class="container mt-3">
+
+<!-- Custom Styles for Booking Form -->
+<!-- Defines layout and appearance of booking components -->
+<style>
+.booking-card {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.booking-header {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+}
+
+.form-control {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.btn-booking {
+    padding: 10px 25px;
+    font-size: 0.9rem;
+    background: var(--maroon);
+    color: white;
+    border: none;
+}
+
+.form-text {
+    font-size: 0.75rem;
+}
+
+.mb-3 {
+    margin-bottom: 12px;
+}
+
+    /* Styles for column padding */
+    .col-md-6 {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+
+    /* Styles for the upload section */
+    .upload-section {
+        border: 1px dashed #ddd;
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        background: #fafafa;
+    }
+</style>
+
+<!-- Django Messages Section -->
+<!-- Displays success/error messages to user -->
+<!-- Shows booking confirmation or validation errors -->
+<div class="container mt-2 mb-3">
     {% if messages %}
         {% for message in messages %}
             <div class="alert shadow-sm border-0 animate__animated animate__fadeInDown" 
@@ -16,63 +73,109 @@
     {% endif %}
 </div>
 
-<div class="container mt-5 mb-5">
+<!-- Booking Form Container -->
+<!-- Main booking form with customer information fields -->
+<!-- Responsive layout with validation -->
+<div class="container mt-3 mb-3">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card shadow booking-card p-4 p-md-5">
-                <h2 class="text-center mb-4 booking-header">Book Your Service</h2>
-                <hr style="border-color: var(--gold); width: 50px; margin: 0 auto 30px auto; border-width: 2px;">
+            <div class="card shadow booking-card p-3">
+                <h2 class="text-center mb-3 booking-header">Book Your Service</h2>
+                <hr style="border-color: var(--gold); width: 50px; margin: 0 auto 15px auto; border-width: 2px;">
 
+                <!-- Booking Form -->
+                <!-- POST method for form submission -->
+                <!-- multipart/form-data for image upload -->
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
 
+                    <!-- Form Fields Grid -->
                     <div class="row">
+                        <!-- Full Name Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-user mr-2"></i> Full Name</label>
                             {{ form.full_name }}
+                            {% if form.full_name.errors %}
+                                <div class="text-danger small">{{ form.full_name.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Enter your full name (letters, spaces, hyphens, and apostrophes only)</small>
                         </div>
 
+                        <!-- Email Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-envelope mr-2"></i> Email</label>
                             {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">We'll never share your email with anyone else</small>
                         </div>
 
+                        <!-- Phone Number Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-phone mr-2"></i> Phone Number</label>
                             {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Include country code for international numbers</small>
                         </div>
 
+                        <!-- Location Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-map-marker-alt mr-2"></i> Location</label>
                             {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="text-danger small">{{ form.location.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Your location for service</small>
                         </div>
 
+                        <!-- Preferred Time Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-calendar-alt mr-2"></i> Preferred Time</label>
                             {{ form.preferred_time }}
+                            {% if form.preferred_time.errors %}
+                                <div class="text-danger small">{{ form.preferred_time.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Select a date and time (cannot be in the past)</small>
                         </div>
 
+                        <!-- Vehicle Type Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-car mr-2"></i> Vehicle Type</label>
                             {{ form.vehicle_type }}
+                            {% if form.vehicle_type.errors %}
+                                <div class="text-danger small">{{ form.vehicle_type.errors.0 }}</div>
+                            {% endif %}
                         </div>
 
+                        <!-- Service Type Field -->
                         <div class="col-md-6 mb-3">
                             <label><i class="fas fa-tools mr-2"></i> Service Type</label>
                             {{ form.service_type }}
+                            {% if form.service_type.errors %}
+                                <div class="text-danger small">{{ form.service_type.errors.0 }}</div>
+                            {% endif %}
                         </div>
 
+                        <!-- Vehicle Image Upload Field -->
                         <div class="col-md-6 mb-3">
                             <div class="upload-section">
                                 <label><i class="fas fa-camera mr-2"></i> Upload Vehicle Image</label>
                                 {{ form.vehicle_image }}
+                                {% if form.vehicle_image.errors %}
+                                    <div class="text-danger small">{{ form.vehicle_image.errors.0 }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Optional: Upload a photo of your vehicle (JPEG, PNG, GIF, WebP, max 5MB)</small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-booking px-5 py-3 shadow">
-                            CONFIRM BOOKING
+                    <!-- Submit Button -->
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-booking shadow">
+                            <i class="fas fa-check mr-2"></i> CONFIRM BOOKING
                         </button>
                     </div>
                 </form>
@@ -80,4 +183,7 @@
         </div>
     </div>
 </div>
+
+<!-- End of Booking Content -->
+<!-- Form includes validation, error handling, and user feedback -->
 {% endblock %}

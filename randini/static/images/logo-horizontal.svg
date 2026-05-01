@@ -1,0 +1,40 @@
+<svg width="400" height="60" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo for horizontal use (headers, receipts) -->
+  <defs>
+    <linearGradient id="maroonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#800000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#600000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffb300;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Compact Logo -->
+  <g>
+    <!-- Wrench Icon -->
+    <g transform="translate(10, 10)">
+      <circle cx="15" cy="15" r="12" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+      <path d="M10 10 L20 20 M20 10 L10 20 M15 5 L15 25 M5 15 L25 15" 
+            stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" />
+      <path d="M8 8 L22 22 M22 8 L8 22" 
+            stroke="url(#goldGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+    </g>
+    
+    <!-- Brand Text -->
+    <text x="45" y="28" font-family="Arial Black, Arial Bold, sans-serif" font-size="22" font-weight="900" fill="url(#maroonGrad)">
+      RANDINI
+    </text>
+    
+    <text x="45" y="45" font-family="Arial Black, Arial Bold, sans-serif" font-size="16" font-weight="900" fill="url(#goldGrad)">
+      AutoGarage
+    </text>
+    
+    <!-- Professional Badge -->
+    <rect x="180" y="15" width="80" height="30" rx="15" fill="url(#maroonGrad)" stroke="url(#goldGrad)" stroke-width="1" />
+    <text x="220" y="34" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">
+      EST. 2005
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,163 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Mechanic Dashboard | Randini Garage{% endblock %}
+{% block page_title %}Mechanic Dashboard{% endblock %}
+
+{% block content %}
+<!-- Force button visibility -->
+<style>
+.btn-sm {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: 1000 !important;
+    min-width: 35px !important;
+    height: 32px !important;
+    font-size: 11px !important;
+    margin: 1px !important;
+    padding: 4px 6px !important;
+}
+.stat-card .card-body { font-size: 14px; }
+.stat-card h2 { font-size: 1.8rem !important; }
+.stat-card h6 { font-size: 0.85rem !important; }
+.stat-card p { font-size: 0.85rem !important; }
+.btn { font-size: 0.9rem !important; font-weight: 500; }
+.table { font-size: 0.9rem !important; }
+.badge { font-size: 0.8rem !important; padding: 4px 8px; }
+.card-header h5 { font-size: 1rem !important; }
+.text-muted { font-size: 0.85rem !important; }
+.fw-bold { font-weight: 600 !important; }
+</style>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card border-start border-warning border-4 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="text-uppercase text-muted fw-bold" style="font-size: 0.85rem;">Pending Jobs</h6>
+            <h2 class="fw-bold text-warning mb-0">{{ pending_bookings }}</h2>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Waiting to be started</p>
+          </div>
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:rgba(255,193,7,.15);">
+            <i class="bi bi-clock-history text-warning" style="font-size: 1.5rem;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card border-start border-primary border-4 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="text-uppercase text-muted fw-bold" style="font-size: 0.85rem;">In Progress</h6>
+            <h2 class="fw-bold text-primary mb-0">{{ inprogress_bookings }}</h2>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Currently in the garage</p>
+          </div>
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:rgba(13,110,253,.15);">
+            <i class="bi bi-tools text-primary" style="font-size: 1.5rem;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card border-start border-success border-4 h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="text-uppercase text-muted fw-bold" style="font-size: 0.85rem;">Completed Today</h6>
+            <h2 class="fw-bold text-success mb-0">{{ completed_today }}</h2>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Jobs finished today</p>
+          </div>
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:50px;height:50px;background:rgba(25,135,84,.15);">
+            <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+    <h5 class="fw-bold mb-0"><i class="bi bi-calendar2-check-fill me-2" style="color:#800000;"></i>Recent Bookings</h5>
+    <div>
+      <a href="{% url 'print_booking_report' %}" class="btn btn-sm rounded-pill px-3 me-2" style="background:#800000;color:#fff;" target="_blank">
+        <i class="bi bi-printer-fill me-1"></i>Print Report
+      </a>
+      <a href="{% url 'staff_bookings' %}" class="btn btn-sm rounded-pill px-3" style="background:#800000;color:#fff;">View All</a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table data-table mb-0">
+        <thead><tr><th style="font-size: 0.9rem;">Customer</th><th style="font-size: 0.9rem;">Email</th><th style="font-size: 0.9rem;">Phone</th><th style="font-size: 0.9rem;">Location</th><th style="font-size: 0.9rem;">Vehicle</th><th style="font-size: 0.9rem;">Service</th><th style="font-size: 0.9rem;">Preferred Time</th><th style="font-size: 0.9rem;">Image</th><th style="font-size: 0.9rem;">Status</th><th style="font-size: 0.9rem;">Actions</th></tr></thead>
+        <tbody>
+          {% for b in recent_bookings %}
+          <tr>
+            <td class="fw-semibold" style="font-size: 0.9rem;">{{ b.full_name }}</td>
+            <td style="font-size: 0.9rem;">{{ b.email }}</td>
+            <td style="font-size: 0.9rem;">{{ b.phone }}</td>
+            <td style="font-size: 0.9rem;">{{ b.location }}</td>
+            <td style="font-size: 0.9rem;">{{ b.get_vehicle_type_display }}</td>
+            <td style="font-size: 0.9rem;">{{ b.get_service_type_display }}</td>
+            <td class="text-muted" style="font-size: 0.85rem;">{{ b.preferred_time|date:"d M, H:i" }}</td>
+            <td>
+              {% if b.vehicle_image %}
+                <img src="{{ b.vehicle_image.url }}" alt="Vehicle" style="max-width:50px; max-height:50px;">
+              {% else %}
+                <span class="text-muted">No Image</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if b.status == 'Completed' %}<span class="badge bg-success">Completed</span>
+              {% elif b.status == 'In Progress' %}<span class="badge bg-primary">In Progress</span>
+              {% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}
+            </td>
+            <td>
+              <!-- Status & Price Update Form -->
+              <form method="POST" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="booking_id" value="{{ b.id }}">
+                <div class="d-flex flex-column gap-1">
+                  <div class="d-flex gap-1">
+                    <button type="submit" name="set_pending" class="btn btn-xs btn-outline-warning"
+                            title="Set Pending" style="min-width: 24px; font-weight: bold; font-size: 9px; padding: 2px 4px;"
+                            onclick="return confirm('Set booking #{{ b.id }} to Pending?')">P</button>
+                    <button type="submit" name="set_inprogress" class="btn btn-xs btn-outline-primary" title="In Progress"
+                            style="min-width: 24px; font-weight: bold; font-size: 9px; padding: 2px 4px;"
+                            onclick="return confirm('Set booking #{{ b.id }} to In Progress?')">IP</button>
+                    <button type="submit" name="set_completed" class="btn btn-xs btn-outline-success" title="Complete"
+                            style="min-width: 24px; font-weight: bold; font-size: 9px; padding: 2px 4px;"
+                            onclick="return confirm('Complete booking #{{ b.id }}?')">C</button>
+                  </div>
+                   <div class="d-flex gap-1">
+                     <a href="{% url 'print_receipt' b.id %}" class="btn btn-xs btn-outline-secondary" title="Print Receipt" target="_blank"
+                        style="min-width: 24px; font-weight: bold; font-size: 9px; padding: 2px 4px;">
+                       <i class="bi bi-printer"></i>
+                     </a>
+                     <a href="{% url 'create_invoice_from_booking' b.id %}" class="btn btn-xs btn-outline-success" title="Create Invoice" target="_blank"
+                        style="min-width: 24px; font-weight: bold; font-size: 9px; padding: 2px 4px;">
+                       <i class="bi bi-file-earmark-plus"></i>
+                     </a>
+                     <button type="submit" name="delete_booking" class="btn btn-xs btn-danger" title="Delete Booking"
+                            style="min-width: 24px; font-weight: bold; font-size: 9px; padding: 2px 4px;"
+                            onclick="return confirm('DELETE Booking #{{ b.id }}? This CANNOT be undone!')">
+                       <i class="bi bi-trash"></i>
+                     </button>
+                   </div>
+                </div>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="10" class="text-center py-4 text-muted" style="font-size: 0.9rem;">No bookings found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

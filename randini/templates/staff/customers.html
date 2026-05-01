@@ -1,62 +1,251 @@
 {% extends 'staff/admin_base.html' %}
+{% block title %}Customers | Randini Garage{% endblock %}
+{% block page_title %}Registered Customers{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold m-0">Registered customers</h2>
-        
-        <form method="GET" action="" class="d-flex gap-2">
-            <input type="text" name="q" class="form-control" placeholder="search by name or email..." value="{{ query|default:'' }}">
-            <button type="submit" class="btn bg-maroon text-white">search</button>
-            {% if query %}
-                <a href="{% url 'staff_customers' %}" class="btn btn-outline-secondary">clear</a>
-            {% endif %}
-        </form>
+<style>
+  .btn { font-size: 1rem; font-weight: 500; }
+  .table { font-size: 1rem; }
+  .badge { font-size: 0.9rem; padding: 6px 12px; }
+  .text-muted { font-size: 0.95rem; }
+  
+  /* Enhanced Status Badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .status-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    padding: 2px;
+  }
+  
+  .status-active {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  }
+  
+  .status-active::before {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .status-inactive {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+  }
+  
+  .status-inactive::before {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Enhanced Action Buttons */
+  .btn-status {
+    padding: 6px 12px;
+    border-radius: 0;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-status::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .btn-status:hover::before {
+    left: 100%;
+  }
+  
+  .btn-status:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn-activate {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-color: #007bff;
+  }
+  
+  .btn-deactivate {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    color: #212529;
+    border-color: #ffc107;
+  }
+  
+  .btn-activate:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+  
+  .btn-deactivate:hover {
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  }
+  
+  /* Enhanced Table Styling */
+  .table td {
+    vertical-align: middle;
+  }
+  
+  .status-cell {
+    text-align: center;
+  }
+  
+  .actions-cell {
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  /* Print Styles */
+  @media print {
+    .no-print { display: none !important; }
+    .sidebar, .topbar { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .page-body { padding: 10px !important; }
+    .card { border: 1px solid #ddd !important; box-shadow: none !important; margin-bottom: 15px !important; }
+    .card-header { background: #f8f9fa !important; border-bottom: 1px solid #ddd !important; }
+    .table { font-size: 0.9rem !important; }
+    .table th { background: #f8f9fa !important; color: #000 !important; }
+    .table td { border: 1px solid #ddd !important; padding: 8px !important; }
+    .btn { color: #000 !important; text-decoration: none !important; border: 1px solid #ddd !important; background: #fff !important; }
+    .badge { border: 1px solid #ddd !important; background: #f8f9fa !important; color: #000 !important; }
+    .status-badge { 
+      background: #f8f9fa !important; 
+      color: #000 !important; 
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+    }
+    .status-active, .status-inactive {
+      background: #f8f9fa !important;
+      color: #000 !important;
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+    }
+  }
+</style>
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <h6 class="fw-bold mb-0">
+      <i class="bi bi-people-fill me-2" style="color:#800000;"></i>
+      All Customers <span class="badge bg-secondary ms-1">{{ total_customer_count }}</span>
+    </h6>
+    <div class="d-flex gap-2">
+      {% if request.user.is_superuser %}
+      <a href="{% url 'add_customer' %}" class="btn btn-sm btn-success rounded-pill">
+        <i class="bi bi-person-plus-fill me-1"></i>Add Customer
+      </a>
+      {% endif %}
+      <form method="GET" class="d-flex gap-2">
+        <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm rounded-pill"
+             placeholder="Search by name or email..." style="width:240px;">
+        <button class="btn btn-sm btn-outline-secondary rounded-pill">Search</button>
+        {% if query %}<a href="{% url 'staff_customers' %}" class="btn btn-sm btn-outline-secondary rounded-pill">Clear</a>{% endif %}
+      </form>
+      <button onclick="window.print()" class="btn btn-sm btn-outline-dark rounded-pill">
+        <i class="bi bi-printer-fill me-1"></i>Print
+      </button>
     </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-maroon text-white">
-                    <tr>
-                        <th>name</th>
-                        <th>email</th>
-                        <th>phone</th>
-                        <th>username</th>
-                        <th>bookings</th>
-                        <th class="text-center">actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for customer in customers %}
-                    <tr>
-                        <td class="fw-bold">{{ customer.first_name }} {{ customer.last_name }}</td>
-                        <td>{{ customer.email }}</td>
-                        <td>{{ customer.customer_profile.phone|default:"no phone" }}</td>
-                        <td><span class="badge bg-light text-dark">{{ customer.username }}</span></td>
-                        <td><span class="badge bg-info">{{ customer.num_bookings }}</span></td>
-                        <td class="text-center">
-                            <a href="{% url 'delete_customer' customer.id %}" 
-                               class="btn btn-danger btn-sm" 
-                               onclick="return confirm('are you sure you want to delete this customer?')">
-                               delete
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">
-                            {% if query %}
-                                no customers match "{{ query }}"
-                            {% else %}
-                                no customers found.
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table data-table mb-0">
+        <thead>
+          <tr><th class="ps-4">Name</th><th>Email</th><th>Phone</th><th class="text-center">Status</th><th class="text-center">Bookings</th><th class="text-center">Total Spent</th><th class="text-center">Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+          <tr>
+            <td class="ps-4">
+              <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                     style="width:36px;height:36px;background:#800000;font-size:.8rem;flex-shrink:0;">
+                  {{ customer.user.first_name|slice:":1"|upper }}{{ customer.user.last_name|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div class="fw-semibold">{{ customer.user.get_full_name|default:"—" }}</div>
+                  <div class="small text-muted">Joined {{ customer.user.date_joined|date:"d M Y" }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ customer.user.email }}</td>
+            <td>{{ customer.phone_number|default:"—" }}</td>
+            <td class="status-cell">
+              {% if customer.user.is_active %}
+                <div class="status-badge status-active">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span>Active</span>
+                </div>
+              {% else %}
+                <div class="status-badge status-inactive">
+                  <i class="bi bi-x-circle-fill"></i>
+                  <span>Inactive</span>
+                </div>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <span class="badge bg-light text-dark border px-3">{{ customer.num_bookings }}</span>
+            </td>
+            <td class="text-center fw-bold text-success">
+              KSh {{ customer.total_spent|default:"0"|floatformat:0 }}
+            </td>
+            <td class="actions-cell">
+              <a href="{% url 'customer_detail' customer.user.id %}" class="btn btn-sm btn-outline-dark rounded-pill me-1">
+                <i class="bi bi-eye-fill"></i> View
+              </a>
+              {% if request.user.is_superuser %}
+              <a href="{% url 'admin_change_user_password_with_id' customer.user.id %}" class="btn btn-sm btn-outline-warning rounded-pill me-1" title="Change Password">
+                <i class="bi bi-key-fill"></i>
+              </a>
+              {% endif %}
+              <form action="{% url 'delete_customer' customer.user.id %}" method="POST" class="d-inline"
+                    onsubmit="return confirm('Delete customer {{ customer.user.get_full_name }}?');">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-trash-fill"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              {% if query %}No customers match "{{ query }}"{% else %}No customers registered yet.{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Receipt - {{ garage_info.name }}</title>
+    <style>
+        @media print {
+            body { font-size: 12px; }
+            .no-print { display: none !important; }
+            .receipt-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 20px;
+                box-shadow: none;
+            }
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .receipt-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header { text-align: center; border-bottom: 2px solid #800000; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { color: #800000; margin: 0; font-size: 24px; }
+        .header p { margin: 5px 0; color: #666; }
+        .receipt-info { margin-bottom: 20px; }
+        .receipt-info h3 { color: #800000; margin-bottom: 15px; font-size: 18px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .info-label { font-weight: 600; color: #333; }
+        .info-value { color: #666; }
+        .order-items { margin: 20px 0; }
+        .item-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .item-image { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 15px; }
+        .item-details { flex: 1; }
+        .item-name { font-weight: 600; margin-bottom: 5px; }
+        .item-meta { font-size: 0.9rem; color: #666; }
+        .item-price { font-weight: 600; color: #800000; }
+        .total-row { border-top: 2px solid #800000; padding-top: 10px; margin-top: 10px; font-weight: bold; font-size: 16px; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px; }
+        .no-print { text-align: center; margin: 20px 0; }
+        .btn-print { background: #800000; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-print:hover { background: #600000; }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="header">
+            <h1>{{ garage_info.name }}</h1>
+            <p>{{ garage_info.address }}</p>
+            <p>{{ garage_info.phone }}</p>
+            <p>{{ garage_info.email }}</p>
+        </div>
+
+        <div class="receipt-info">
+            <h3>ORDER RECEIPT</h3>
+            <div class="info-row">
+                <span class="info-label">Order #:</span>
+                <span class="info-value">{{ order.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Date:</span>
+                <span class="info-value">{{ order.created_at|date:"d M, Y H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Customer:</span>
+                <span class="info-value">{{ order.full_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Phone:</span>
+                <span class="info-value">{{ order.phone_number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ order.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Address:</span>
+                <span class="info-value">{{ order.address }}, {{ order.city }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Payment:</span>
+                <span class="info-value">{% if order.payment_method == 'mpesa' %}M-Pesa{% else %}Cash{% endif %}</span>
+            </div>
+            {% if order.transaction_id %}
+            <div class="info-row">
+                <span class="info-label">Transaction ID:</span>
+                <span class="info-value">{{ order.transaction_id }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="order-items">
+            <h3>ORDER ITEMS</h3>
+            {% for item in order.items.all %}
+            <div class="item-row">
+                {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+                {% else %}
+                <div class="item-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-image" style="color: #999;"></i>
+                </div>
+                {% endif %}
+                <div class="item-details">
+                    <div class="item-name">{{ item.product.name }}</div>
+                    <div class="item-meta">Quantity: {{ item.quantity }}</div>
+                </div>
+                <div class="item-price">KSh {{ item.get_total_item_price }}</div>
+            </div>
+            {% endfor %}
+            <div class="total-row">
+                <span>Total Amount:</span>
+                <span>KSh {{ order.total_amount }}</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Thank you for choosing {{ garage_info.name }}!</strong></p>
+            <p>This receipt serves as proof of purchase.</p>
+            <p>For inquiries, please contact: {{ garage_info.phone }}</p>
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">Print Receipt</button>
+        <br><br>
+        <a href="{% url 'staff_orders' %}" style="color: #800000; text-decoration: none;">Back to Orders</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

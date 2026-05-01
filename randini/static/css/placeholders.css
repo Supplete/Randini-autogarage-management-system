@@ -1,0 +1,156 @@
+/* Placeholder Images and Fallbacks */
+
+/* Spare part placeholder */
+.placeholder-sparepart {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #6c757d;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+}
+
+.placeholder-sparepart::before {
+    content: "🔧";
+    font-size: 48px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.placeholder-sparepart::after {
+    content: "Spare Part Image";
+    font-weight: 600;
+}
+
+/* Team member placeholder */
+.placeholder-team {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--maroon), #600000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    margin: 0 auto 15px;
+}
+
+.placeholder-team::before {
+    content: "👨‍🔧";
+}
+
+/* Garage hero placeholder */
+.placeholder-hero {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, var(--maroon), #600000);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+}
+
+.placeholder-hero::before {
+    content: "🚗";
+    font-size: 64px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.placeholder-hero::after {
+    content: "Randini Auto Garage";
+    font-family: 'Arial Black', sans-serif;
+    display: block;
+}
+
+/* Service placeholder */
+.placeholder-service {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--gold), #ffb300);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--maroon);
+    font-size: 24px;
+    margin: 0 auto 15px;
+}
+
+/* Loading placeholder */
+.loading-placeholder {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Image error fallback */
+img {
+    position: relative;
+}
+
+img::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+img::after {
+    content: "⚠️ Image not available";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #6c757d;
+    font-size: 14px;
+    text-align: center;
+    z-index: 1;
+}
+
+/* Responsive placeholders */
+@media (max-width: 768px) {
+    .placeholder-sparepart {
+        height: 150px;
+        font-size: 12px;
+    }
+    
+    .placeholder-hero {
+        height: 250px;
+        font-size: 18px;
+    }
+    
+    .placeholder-hero::before {
+        font-size: 48px;
+    }
+    
+    .placeholder-team {
+        width: 120px;
+        height: 120px;
+        font-size: 36px;
+    }
+}

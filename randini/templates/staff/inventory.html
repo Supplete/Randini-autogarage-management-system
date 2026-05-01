@@ -1,157 +1,104 @@
 {% extends 'staff/admin_base.html' %}
-{% load static %}
-
 {% block title %}Inventory | Randini Garage{% endblock %}
+{% block page_title %}Spare Parts Inventory{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4" style="font-family: 'Segoe UI', sans-serif;">
-
-    <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 5px solid #800000;">
-                <small class="text-muted fw-bold">TOTAL ITEMS</small>
-                <h3 class="fw-bold mb-0 text-dark">{{ total_items }}</h3>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 10px; border-left: 5px solid #dc3545;">
-                <small class="text-muted fw-bold text-danger">LOW STOCK</small>
-                <h3 class="fw-bold mb-0 text-danger">{{ low_stock_count }}</h3>
-            </div>
-        </div>
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <div class="card border-0 shadow-sm rounded-3 py-3 text-center">
+      <h5 class="fw-bold mb-0" style="color:#800000;">{{ total_items }}</h5>
+      <p class="text-muted small mb-0">Total Parts</p>
     </div>
-
-    <!-- Header + Search + Add New -->
-    <div class="card border-0 shadow-sm mb-4" style="border-radius: 10px;">
-        <div class="card-body">
-            <div class="row g-3 align-items-center">
-                <div class="col-xl-4 col-lg-12">
-                    <h2 class="fw-bold mb-1" style="color: #800000; white-space: nowrap;">Stock Inventory</h2>
-                </div>
-                <div class="col-xl-5 col-lg-8">
-                    <form method="GET" action="{% url 'staff_inventory' %}" class="w-100">
-                        <div class="input-group">
-                            <input type="text" name="q" class="form-control border-secondary-subtle"
-                                   placeholder="Search parts..." value="{{ query|default:'' }}"
-                                   style="border-radius: 10px 0 0 10px; height: 45px;">
-                            <button class="btn btn-dark px-4" type="submit" style="border-radius: 0 10px 10px 0;">
-                                Search
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-xl-3 col-lg-4 text-end">
-                    <a href="{% url 'add_sparepart' %}" class="btn btn-success fw-bold w-100 py-2" style="border-radius: 10px; height: 45px; display: flex; align-items: center; justify-content: center;">
-                        New Item
-                    </a>
-                </div>
-            </div>
-        </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card border-0 shadow-sm rounded-3 py-3 text-center">
+      <h5 class="fw-bold text-warning mb-0">{{ low_stock_count }}</h5>
+      <p class="text-muted small mb-0">Low Stock (≤5)</p>
     </div>
-
-    <!-- Inventory Table -->
-    <div class="card border-0 shadow-sm" style="border-radius: 10px; overflow: hidden;">
-        <div class="card-body p-0">
-            <div class="table-responsive" style="width: 100%; overflow-x: auto;">
-                <table class="table table-hover align-middle mb-0" style="min-width: 900px; width: 100%;">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4 py-3 text-muted small" style="width: 50px;">#</th>
-                            <th class="py-3 text-muted small" style="width: 100px;">PREVIEW</th>
-                            <th class="py-3 text-muted small">PART DETAILS</th>
-                            <th class="py-3 text-muted small text-center">PRICE</th>
-                            <th class="py-3 text-muted small text-center">STOCK</th>
-                            <th class="py-3 text-muted small text-center" style="width: 200px;">ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for part in parts %}
-                        <tr {% if part.stock < 5 %}style="background-color: #fff8f8;"{% endif %}>
-                            <td class="ps-4 text-muted small">{{ forloop.counter }}</td>
-                            <td>
-                                {% if part.image %}
-                                    <img src="{{ part.image.url }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" class="shadow-sm">
-                                {% else %}
-                                    <div class="bg-light d-flex align-items-center justify-content-center border" style="width: 50px; height: 50px; border-radius: 8px;">
-                                        No Image
-                                    </div>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="fw-bold text-dark mb-0">{{ part.name }}</div>
-                                <small class="text-muted font-monospace">ID: {{ part.id }}</small>
-                            </td>
-                            <td class="text-center fw-bold">Ksh {{ part.price }}</td>
-                            <td class="text-center">
-                                <span class="badge {% if part.stock < 5 %}bg-danger{% else %}bg-success{% endif %} rounded-pill px-3 py-2" style="min-width: 80px;">
-                                    {{ part.stock }} In Stock
-                                </span>
-                            </td>
-                            <td class="text-center pe-4">
-                                <div class="d-flex justify-content-center gap-2 flex-wrap" style="min-width: 150px;">
-                                    <a href="{% url 'edit_sparepart' part.id %}" class="btn btn-sm btn-primary fw-bold px-3 mb-1" style="border-radius: 6px;">
-                                        Edit
-                                    </a>
-                                    <form action="{% url 'delete_sparepart' part.id %}" method="POST" class="m-0">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-danger fw-bold px-3 mb-1" style="border-radius: 6px;" onclick="return confirm('Permanently delete this part?');">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                No inventory items found. Try a different search.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card border-0 shadow-sm rounded-3 py-3 text-center">
+      <a href="{% url 'stock_report' %}" class="text-decoration-none">
+        <h5 class="fw-bold text-info mb-0"><i class="bi bi-file-bar-graph"></i></h5>
+        <p class="text-muted small mb-0">Stock Report</p>
+      </a>
     </div>
+  </div>
 </div>
 
-<!-- Custom CSS -->
-<style>
-    .container-fluid {
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-
-    .table-responsive {
-        border-radius: 0 0 10px 10px;
-    }
-
-    .btn-danger {
-        background-color: #d9534f !important;
-        border-color: #d43f3a !important;
-        color: white !important;
-    }
-
-    .btn-danger:hover {
-        background-color: #c9302c !important;
-    }
-
-    .btn-primary {
-        background-color: #0d6efd !important;
-        border-color: #0d6efd !important;
-        color: white !important;
-    }
-
-    .btn-primary:hover {
-        background-color: #0b5ed7 !important;
-    }
-
-    td .d-flex {
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-    }
-</style>
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <h6 class="fw-bold mb-0"><i class="bi bi-boxes me-2" style="color:#800000;"></i>All Spare Parts</h6>
+    <div class="d-flex gap-2">
+      <form method="GET" class="d-flex gap-2">
+        <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm rounded-pill"
+               placeholder="Search parts..." style="width:200px;">
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Search</button>
+        {% if query %}<a href="{% url 'staff_inventory' %}" class="btn btn-sm btn-outline-secondary rounded-pill">Clear</a>{% endif %}
+      </form>
+      <a href="{% url 'add_sparepart' %}" class="btn btn-sm fw-bold rounded-pill px-4" style="background:#800000;color:#fff;">
+        <i class="bi bi-plus-lg me-1"></i>Add Part
+      </a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table data-table mb-0">
+        <thead>
+          <tr><th class="text-center">Image</th><th class="ps-4">Part Name</th><th>Description</th><th>Price</th><th>Stock</th><th>Status</th><th class="text-center" style="width: 200px;">Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for part in parts %}
+          <tr>
+            <td class="text-center">
+              {% if part.image %}
+                <img src="{{ part.image.url }}" width="38" height="38" class="rounded-2 object-fit-cover" alt="{{ part.name }}">
+              {% else %}
+                <div class="rounded-2 d-flex align-items-center justify-content-center text-white"
+                     style="width:38px;height:38px;background:#800000;font-size:.75rem;">
+                  <i class="bi bi-gear-fill"></i>
+                </div>
+              {% endif %}
+            </td>
+            <td class="ps-4 fw-semibold">{{ part.name }}</td>
+            <td class="text-muted small">{{ part.description|truncatechars:50|default:"—" }}</td>
+            <td class="fw-bold">KSh {{ part.price }}</td>
+            <td class="fw-bold">{{ part.stock }}</td>
+            <td>
+              {% if part.stock == 0 %}
+                <span class="badge bg-danger rounded-pill">Out of Stock</span>
+              {% elif part.stock <= 5 %}
+                <span class="badge bg-warning text-dark rounded-pill">Low Stock</span>
+              {% else %}
+                <span class="badge bg-success rounded-pill">In Stock</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-1">
+                <a href="{% url 'edit_sparepart' part.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                  <i class="bi bi-pencil-fill"></i> Edit
+                </a>
+                <form action="{% url 'delete_sparepart' part.id %}" method="POST" class="d-inline"
+                      onsubmit="return confirm('Are you sure you want to delete {{ part.name }}? This action cannot be undone.');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-danger rounded-pill" title="Delete {{ part.name }}">
+                    <i class="bi bi-trash-fill"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              {% if query %}No parts match "{{ query }}"{% else %}No spare parts in inventory yet.{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}

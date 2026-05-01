@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Report - {{ garage_info.name }}</title>
+    <style>
+        @media print {
+            body { 
+                font-size: 9pt; 
+                line-height: 1.2;
+                margin: 0;
+                padding: 10px;
+            }
+            .no-print { display: none !important; }
+            .page-break { page-break-after: always; }
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 15px;
+            background: #fff;
+            color: #000;
+        }
+        
+        .report-container { 
+            max-width: 100%; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header { 
+            text-align: center; 
+            border-bottom: 2px solid #800000; 
+            padding-bottom: 15px; 
+            margin-bottom: 20px; 
+        }
+        
+        .header h1 { 
+            color: #800000; 
+            margin: 0; 
+            font-size: 24pt; 
+            font-weight: bold;
+        }
+        
+        .header p { 
+            margin: 5px 0; 
+            color: #666; 
+            font-size: 10pt;
+        }
+        
+        .report-summary { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-bottom: 25px; 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .summary-item { 
+            text-align: center; 
+            min-width: 120px;
+            margin: 5px;
+        }
+        
+        .summary-number { 
+            font-size: 18pt; 
+            font-weight: bold; 
+            color: #800000; 
+        }
+        
+        .summary-label { 
+            color: #666; 
+            font-size: 10pt;
+            margin-top: 5px;
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px;
+            font-size: 9pt;
+        }
+        
+        th { 
+            background: #800000; 
+            color: white; 
+            text-align: left; 
+            padding: 8px 6px;
+            font-weight: bold;
+            font-size: 9pt;
+            border: 1px solid #333;
+        }
+        
+        td { 
+            padding: 6px 4px; 
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+            font-size: 9pt;
+            word-wrap: break-word;
+        }
+        
+        .status-pending { color: #856404; font-weight: bold; }
+        .status-in-progress { color: #007bff; font-weight: bold; }
+        .status-completed { color: #28a745; font-weight: bold; }
+        
+        .no-print { 
+            text-align: center; 
+            margin: 20px 0; 
+            page-break-inside: avoid;
+        }
+        
+        .btn-print { 
+            background: #800000; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 12pt;
+        }
+        
+        .date-range { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            color: #666; 
+            font-size: 10pt;
+        }
+        
+        /* Ensure proper table printing */
+        @media print {
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            td { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>{{ garage_info.name }}</h1>
+            <p>{{ garage_info.address }}</p>
+            <p>{{ garage_info.phone }}</p>
+            <p>{{ garage_info.email }}</p>
+        </div>
+
+        <h2 style="text-align: center; color: #800000; margin-bottom: 20px;">BOOKING REPORT</h2>
+        
+        {% if from_date or to_date %}
+        <div class="date-range">
+            <strong>Report Period:</strong> 
+            {% if from_date %}{{ from_date }}{% endif %} 
+            {% if from_date and to_date %} to {% endif %} 
+            {% if to_date %}{{ to_date }}{% endif %}
+        </div>
+        {% endif %}
+
+        <div class="report-summary">
+            <div class="summary-item">
+                <div class="summary-number">{{ total_bookings }}</div>
+                <div class="summary-label">Total Bookings</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">KSh {{ total_revenue|floatformat:0 }}</div>
+                <div class="summary-label">Total Revenue</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">{{ bookings|length }}</div>
+                <div class="summary-label">Records Shown</div>
+            </div>
+        </div>
+
+        <table style="table-layout: fixed;">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">Booking #</th>
+                    <th style="width: 15%;">Customer</th>
+                    <th style="width: 18%;">Email</th>
+                    <th style="width: 10%;">Phone</th>
+                    <th style="width: 8%;">Location</th>
+                    <th style="width: 12%;">Vehicle</th>
+                    <th style="width: 10%;">Service</th>
+                    <th style="width: 8%;">Preferred Time</th>
+                    <th style="width: 10%;">Created At</th>
+                    <th style="width: 10%;">Updated At</th>
+                    <th style="width: 6%;">Image</th>
+                    <th style="width: 8%;">Status</th>
+                    <th style="width: 6%;">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>#{{ booking.id }}</td>
+                    <td>{{ booking.full_name }}</td>
+                    <td>{{ booking.email }}</td>
+                    <td>{{ booking.phone }}</td>
+                    <td>{{ booking.location }}</td>
+                    <td>{{ booking.get_vehicle_type_display }}</td>
+                    <td>{{ booking.get_service_type_display }}</td>
+                    <td>{{ booking.preferred_time|date:"d M, Y H:i" }}</td>
+                    <td>{{ booking.created_at|date:"d M, Y H:i" }}</td>
+                    <td>{{ booking.updated_at|date:"d M, Y H:i" }}</td>
+                    <td>
+                        {% if booking.vehicle_image %}
+                            <img src="{{ booking.vehicle_image.url }}" alt="Vehicle" style="max-width:50px; max-height:50px;">
+                        {% else %}
+                            <span style="color:#999;">No Image</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking.status == 'Pending' %}
+                            <span class="status-pending">{{ booking.status }}</span>
+                        {% elif booking.status == 'In Progress' %}
+                            <span class="status-in-progress">{{ booking.status }}</span>
+                        {% else %}
+                            <span class="status-completed">{{ booking.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{% if booking.price %}KSh {{ booking.price }}{% else %}-{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="13" style="text-align: center; padding: 40px;">No bookings found for the selected period.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 40px; color: #666; font-size: 12px;">
+            <p><strong>Report generated on:</strong> {% now "d F, Y H:i" %}</p>
+            <p>This is an official report from {{ garage_info.name }}</p>
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">Print Report</button>
+        <br><br>
+        <a href="{% url 'staff_dashboard' %}" style="color: #800000; text-decoration: none;">Back to Dashboard</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Auto-print dialog
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

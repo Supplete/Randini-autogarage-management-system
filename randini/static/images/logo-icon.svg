@@ -1,0 +1,36 @@
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Favicon/Icon version -->
+  <defs>
+    <linearGradient id="iconMaroon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#800000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#600000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffb300;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Circular Background -->
+  <circle cx="30" cy="30" r="28" fill="url(#iconMaroon)" />
+  <circle cx="30" cy="30" r="26" fill="none" stroke="url(#iconGold)" stroke-width="1" />
+  
+  <!-- Wrench & Gear Symbol -->
+  <g transform="translate(30, 30)">
+    <!-- Outer Gear -->
+    <circle cx="0" cy="0" r="18" fill="none" stroke="url(#iconGold)" stroke-width="2" />
+    <!-- Gear Teeth -->
+    <path d="M0 -18 L2 -14 L4 -16 L6 -12 L8 -14 L10 -10 L12 -12 L14 -8 L16 -10 L18 -6 L16 -4 L18 -2 L18 2 L16 4 L18 6 L16 10 L14 8 L12 12 L10 10 L8 14 L6 12 L4 16 L2 14 L0 18 L-2 14 L-4 16 L-6 12 L-8 14 L-10 10 L-12 12 L-14 8 L-16 10 L-18 6 L-16 4 L-18 2 L-18 -2 L-16 -4 L-18 -6 L-16 -10 L-14 -8 L-12 -12 L-10 -10 L-8 -14 L-6 -12 L-4 -16 L-2 -14 Z" 
+          fill="url(#iconGold)" />
+    
+    <!-- Wrench Cross -->
+    <path d="M-8 -8 L8 8 M8 -8 L-8 8 M0 -12 L0 12 M-12 0 L12 0" 
+          stroke="white" stroke-width="3" stroke-linecap="round" />
+    <path d="M-6 -6 L6 6 M6 -6 L-6 6" 
+          stroke="url(#iconGold)" stroke-width="2" stroke-linecap="round" />
+    
+    <!-- Center Circle -->
+    <circle cx="0" cy="0" r="6" fill="url(#iconMaroon)" />
+    <circle cx="0" cy="0" r="4" fill="url(#iconGold)" />
+  </g>
+</svg>

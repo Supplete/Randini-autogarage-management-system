@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Verify Email | Randini Garage{% endblock %}
+
+{% block content %}
+<style>
+  .auth-wrap { min-height:80vh; display:flex; align-items:center; justify-content:center; padding:30px 15px; background:linear-gradient(135deg,#f9f4f4 0%,#fff8f0 100%); }
+  .auth-card { background:#fff; padding:45px 40px; border-radius:18px; box-shadow:0 12px 40px rgba(128,0,0,0.12); width:100%; max-width:420px; text-align:center; }
+  .otp-icon { font-size:3rem; color:#800000; margin-bottom:12px; }
+  .otp-inputs { display:flex; gap:10px; justify-content:center; margin:24px 0; }
+  .otp-inputs input { width:50px; height:58px; font-size:1.5rem; text-align:center; border:2px solid #dee2e6; border-radius:10px; font-weight:700; }
+  .otp-inputs input:focus { border-color:#800000; outline:none; box-shadow:0 0 0 3px rgba(128,0,0,.12); }
+  .btn-verify { height:50px; background:#800000; border:none; color:#fff; font-weight:700; border-radius:10px; width:100%; font-size:1rem; }
+  .btn-verify:hover { background:#600000; color:#fff; }
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="otp-icon"><i class="bi bi-envelope-check-fill"></i></div>
+    <h4 class="fw-bold">Check Your Email</h4>
+    <p class="text-muted mb-0">We sent a 6-digit verification code to</p>
+    <p class="fw-bold" style="color:#800000;">{{ email }}</p>
+    <p class="text-muted small">Enter the code below to activate your account. It expires in 10 minutes.</p>
+
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} py-2 rounded-3 text-start">
+        <i class="bi bi-exclamation-circle me-2"></i>{{ message }}
+      </div>
+    {% endfor %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="otp-inputs" id="otpBoxes">
+        <input type="text" maxlength="1" class="otp-box" autofocus>
+        <input type="text" maxlength="1" class="otp-box">
+        <input type="text" maxlength="1" class="otp-box">
+        <input type="text" maxlength="1" class="otp-box">
+        <input type="text" maxlength="1" class="otp-box">
+        <input type="text" maxlength="1" class="otp-box">
+      </div>
+      <!-- Hidden input holds the combined OTP value -->
+      <input type="hidden" name="otp" id="otpHidden" value="{% if debug_otp %}{{ debug_otp }}{% endif %}">
+      <button type="submit" class="btn-verify" onclick="combineOtp()">Verify &amp; Continue</button>
+    </form>
+
+    <div class="mt-4">
+      <p class="text-muted small mb-1">Didn't receive the code?</p>
+      <a href="{% url 'resend_otp' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4">Resend Code</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-advance OTP box focus
+const boxes = document.querySelectorAll('.otp-box');
+boxes.forEach((box, i) => {
+  box.addEventListener('input', () => {
+    if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+  });
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus();
+  });
+});
+
+function combineOtp() {
+  const combined = [...boxes].map(b => b.value).join('');
+  if (combined) {
+    document.getElementById('otpHidden').value = combined;
+  }
+}
+
+// Auto-fill OTP for development
+{% if debug_otp %}
+document.addEventListener('DOMContentLoaded', function() {
+    const otp = '{{ debug_otp }}';
+    const boxes = document.querySelectorAll('.otp-box');
+    for (let i = 0; i < Math.min(otp.length, boxes.length); i++) {
+        boxes[i].value = otp[i];
+    }
+    // Combine immediately
+    document.getElementById('otpHidden').value = otp;
+});
+{% endif %}
+
+// Handle success messages
+document.addEventListener('DOMContentLoaded', function() {
+  // Check for success message and show SweetAlert
+  const alerts = document.querySelectorAll('.alert-success');
+  alerts.forEach(function(alert) {
+    const message = alert.textContent.trim();
+    if (message.includes('Welcome')) {
+      // Extract customer name from success message
+      const nameMatch = message.match(/Welcome to Randini Garage, (.+?)!/);
+      const customerName = nameMatch ? nameMatch[1] : 'there';
+      
+      // Show registration success SweetAlert
+      setTimeout(function() {
+        SweetAlertUtils.registrationSuccess(customerName, function() {
+          window.location.href = '{% url "home" %}';
+        });
+      }, 500);
+      
+      // Hide the original alert
+      alert.style.display = 'none';
+    }
+  });
+  
+  // Handle error messages
+  const errorAlerts = document.querySelectorAll('.alert-danger');
+  errorAlerts.forEach(function(alert) {
+    const message = alert.textContent.trim();
+    if (message) {
+      setTimeout(function() {
+        SweetAlertUtils.error('Verification Failed', message);
+      }, 500);
+      alert.style.display = 'none';
+    }
+  });
+});
+</script>
+{% endblock %}

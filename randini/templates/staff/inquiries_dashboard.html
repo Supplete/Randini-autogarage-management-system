@@ -1,0 +1,436 @@
+{% extends 'staff/admin_base.html' %}
+{% block title %}Inquiries Dashboard | Randini Garage{% endblock %}
+{% block page_title %}Customer Inquiries{% endblock %}
+
+{% block content %}
+
+<style>
+/* Enhanced Styling for Inquiries Dashboard */
+:root {
+    --primary-color: #800000;
+    --secondary-color: #ffc107;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --light-bg: #f8f9fa;
+    --border-color: #dee2e6;
+}
+
+/* Summary Cards */
+.summary-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.summary-card .card-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+.summary-card h5 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.summary-card p {
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Main Table Card */
+.table-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.table-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #a52a2a 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+}
+.table-card .card-header h6 {
+    font-weight: 600;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Table Styling */
+.custom-table {
+    margin: 0;
+}
+.custom-table thead {
+    background-color: var(--light-bg);
+}
+.custom-table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #495057;
+    border: none;
+    padding: 1rem 0.75rem;
+}
+.custom-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+.custom-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+.custom-table tbody td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border: none;
+}
+
+/* Unread Message Styling */
+.unread-row {
+    background: linear-gradient(90deg, #fff5f5 0%, #ffffff 100%);
+    border-left: 4px solid var(--danger-color);
+    font-weight: 500;
+}
+.unread-row td:first-child {
+    font-weight: 600;
+}
+
+/* Message Content */
+.message-subject {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+.message-preview {
+    color: #6c757d;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Customer Info */
+.customer-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+.customer-email {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Date Styling */
+.message-date {
+    font-size: 0.85rem;
+    color: #495057;
+    font-weight: 500;
+}
+.message-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* Action Buttons */
+.btn-sm {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: 1000 !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    font-size: 0.75rem !important;
+    margin: 0 2px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+.btn-sm:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
+}
+
+/* Reply Form Styling */
+.reply-form {
+    background: var(--light-bg);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.reply-form .form-control {
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+.reply-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(128,0,0,0.25);
+}
+.reply-form .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.reply-form .btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Status Indicators */
+.status-badge {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+.status-badge.unread {
+    background-color: var(--danger-color);
+    animation: pulse 2s infinite;
+}
+.status-badge.read {
+    background-color: var(--success-color);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .summary-card .card-body {
+        padding: 1rem;
+    }
+    .summary-card h5 {
+        font-size: 1.5rem;
+    }
+    .custom-table thead th,
+    .custom-table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    .btn-sm {
+        min-width: 28px !important;
+        height: 28px !important;
+        font-size: 0.7rem !important;
+    }
+}
+</style>
+
+<!-- JavaScript for Reply Form Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle collapse functionality for reply forms
+    const collapseButtons = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    
+    collapseButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('data-bs-target'));
+            if (target) {
+                // Toggle collapse
+                target.classList.toggle('show');
+                
+                // Auto-focus textarea when opening
+                if (target.classList.contains('show')) {
+                    const textarea = target.querySelector('textarea[name="reply_message"]');
+                    if (textarea) {
+                        setTimeout(() => textarea.focus(), 100);
+                    }
+                } else {
+                    // Clear form when closing
+                    const textarea = target.querySelector('textarea[name="reply_message"]');
+                    if (textarea) {
+                        textarea.value = '';
+                    }
+                }
+            }
+        });
+    });
+    
+    // Handle reply form submissions
+    const replyForms = document.querySelectorAll('form');
+    replyForms.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            const submitButton = form.querySelector('button[name="send_reply"]');
+            if (submitButton) {
+                // Show loading state
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Sending...';
+                submitButton.disabled = true;
+                
+                // Reset after 2 seconds (simulate submission)
+                setTimeout(() => {
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                    
+                    // Close reply form
+                    const replyCollapse = form.closest('.collapse');
+                    if (replyCollapse) {
+                        replyCollapse.classList.remove('show');
+                    }
+                    
+                    // Clear form
+                    const textarea = form.querySelector('textarea[name="reply_message"]');
+                    if (textarea) {
+                        textarea.value = '';
+                    }
+                    
+                    // Show success message (you can customize this)
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'alert alert-success alert-dismissible fade show mt-2';
+                    successDiv.innerHTML = '<i class="bi bi-check-circle me-2"></i>Reply sent successfully!';
+                    form.parentElement.appendChild(successDiv);
+                    
+                    // Remove success message after 3 seconds
+                    setTimeout(() => successDiv.remove(), 3000);
+                }, 2000);
+            }
+        });
+    });
+});
+</script>
+
+<!-- Enhanced Summary Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="summary-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-center mb-3">
+          <div class="status-badge unread"></div>
+          <h5 class="text-danger mb-0">{{ unread_count }}</h5>
+        </div>
+        <p class="text-muted mb-0">Unread Messages</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="summary-card">
+      <div class="card-body">
+        <h5 class="text-secondary mb-0">{{ total_messages }}</h5>
+        <p class="text-muted mb-0">Total Messages</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="summary-card">
+      <div class="card-body">
+        <a href="{% url 'staff_inquiries' %}" class="btn btn-primary btn-sm px-4 py-2 rounded-pill">
+          <i class="bi bi-gear me-2"></i>Manage All Messages
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Messages Table -->
+<div class="table-card">
+  <div class="card-header">
+    <h6><i class="bi bi-chat-left-text-fill me-2"></i>Recent Customer Messages</h6>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Message</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for msg in recent_messages %}
+          <tr class="{% if not msg.is_read %}unread-row{% endif %}">
+            <td>
+              <div class="customer-name">
+                {% if not msg.is_read %}<div class="status-badge unread"></div>{% endif %}
+                {{ msg.name }}
+              </div>
+              <div class="customer-email">{{ msg.email }}</div>
+            </td>
+            <td>
+              <div class="message-subject">{{ msg.subject }}</div>
+              <div class="message-preview">{{ msg.message|truncatewords:15 }}</div>
+            </td>
+            <td>
+              <div class="message-date">{{ msg.created_at|date:"d M Y" }}</div>
+              <div class="message-time">{{ msg.created_at|time:"g:i a" }}</div>
+            </td>
+            <td>
+              <div class="d-flex gap-1 flex-wrap">
+                {% if not msg.is_read %}
+                <form method="POST" class="d-inline" action="{% url 'staff_inquiries' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="msg_id" value="{{ msg.id }}">
+                  <button name="mark_read" class="btn btn-sm btn-success" title="Mark as Read">
+                    <i class="bi bi-check"></i>
+                  </button>
+                </form>
+                {% endif %}
+                <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#reply-{{ msg.id }}" title="Reply">
+                  <i class="bi bi-reply"></i>
+                </button>
+                <form method="POST" class="d-inline" action="{% url 'staff_inquiries' %}" onsubmit="return confirm('Delete this message?');">
+                  {% csrf_token %}
+                  <input type="hidden" name="msg_id" value="{{ msg.id }}">
+                  <button name="delete" class="btn btn-sm btn-danger" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+              
+              <!-- Inline Reply Form -->
+              <div id="reply-{{ msg.id }}" class="collapse mt-3">
+                <div class="reply-form">
+                  <form method="POST" action="{% url 'staff_inquiries' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="msg_id" value="{{ msg.id }}">
+                    <div class="row g-2">
+                      <div class="col-12">
+                        <input type="email" class="form-control form-control-sm" value="{{ msg.email }}" readonly>
+                      </div>
+                      <div class="col-12">
+                        <input type="text" class="form-control form-control-sm" name="reply_subject" value="Re: {{ msg.subject }}" required>
+                      </div>
+                      <div class="col-12">
+                        <textarea class="form-control form-control-sm" name="reply_message" rows="3" placeholder="Type your reply..." required></textarea>
+                      </div>
+                      <div class="col-12">
+                        <button name="send_reply" class="btn btn-primary btn-sm">
+                          <i class="bi bi-send-fill me-1"></i>Send Reply
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#reply-{{ msg.id }}">
+                          <i class="bi bi-x-circle me-1"></i>Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center py-5">
+              <div class="text-muted">
+                <i class="bi bi-chat-left-text fs-1 d-block mb-3 opacity-50"></i>
+                <h6 class="fw-bold">No customer messages found</h6>
+                <p class="small">Customer inquiries will appear here when they contact you.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

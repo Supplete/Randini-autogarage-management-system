@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Invoice - Randini Garage</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .invoice-header {
+            background: linear-gradient(135deg, #800000 0%, #600000 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .company-info h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .company-info p {
+            margin: 5px 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .invoice-title {
+            text-align: center;
+            margin: 30px 20px;
+            color: #800000;
+        }
+        .invoice-title h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .customer-info {
+            margin: 0 20px 30px 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #800000;
+        }
+        .customer-info h3 {
+            margin: 0 0 15px 0;
+            color: #800000;
+            font-size: 1.1rem;
+        }
+        .customer-info p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        .service-details {
+            margin: 0 20px 30px 20px;
+        }
+        .service-details h3 {
+            margin: 0 0 15px 0;
+            color: #800000;
+            font-size: 1.1rem;
+        }
+        .service-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .service-table th {
+            background: #800000;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .service-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+        .service-table tr:last-child td {
+            border-bottom: none;
+        }
+        .amount {
+            text-align: right;
+            font-weight: 600;
+            color: #28a745;
+        }
+        .total-section {
+            margin: 0 20px 30px 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: right;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        .total-row.grand-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #800000;
+            border-top: 2px solid #800000;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+        .payment-info {
+            margin: 0 20px 30px 20px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        .payment-info h3 {
+            margin: 0 0 15px 0;
+            color: #856404;
+            font-size: 1.1rem;
+        }
+        .payment-methods {
+            margin: 15px 0;
+        }
+        .payment-method {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ffc107;
+        }
+        .payment-method strong {
+            color: #856404;
+        }
+        .footer {
+            text-align: center;
+            margin: 20px;
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        .thank-you {
+            text-align: center;
+            margin: 30px 20px;
+            color: #28a745;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="company-info">
+                <h1>RANDINI AUTO GARAGE</h1>
+                <p>Bungoma, Kenya</p>
+                <p>Contact: +254 711962088 | Email: randinigarage@gmail.com</p>
+            </div>
+        </div>
+
+        <!-- Invoice Title -->
+        <div class="invoice-title">
+            <h2>SERVICE INVOICE</h2>
+            <p>Invoice Number: INV-{{ booking.id|stringformat:"06d" }}</p>
+            <p>Date: {{ invoice_date|date:"F d, Y" }}</p>
+        </div>
+        
+        <!-- Customer Information -->
+        <div class="customer-info">
+            <h3>Customer Information</h3>
+            <p><strong>Name:</strong> {{ customer.name }}</p>
+            <p><strong>Email:</strong> {{ customer.email }}</p>
+            <p><strong>Phone:</strong> {{ customer.phone }}</p>
+            <p><strong>Vehicle:</strong> {{ booking.vehicle_make }} {{ booking.vehicle_model }} ({{ booking.vehicle_year }})</p>
+            <p><strong>License Plate:</strong> {{ booking.license_plate }}</p>
+        </div>
+
+        <!-- Service Details -->
+        <div class="service-details">
+            <h3>Service Details</h3>
+            <table class="service-table">
+                <thead>
+                    <tr>
+                        <th>Service Description</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th class="amount">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ booking.service_type }}</td>
+                        <td>1</td>
+                        <td>KSh {{ booking.price|floatformat:2 }}</td>
+                        <td class="amount">KSh {{ booking.price|floatformat:2 }}</td>
+                    </tr>
+                    {% if spare_parts %}
+                    {% for part in spare_parts %}
+                    <tr>
+                        <td>{{ part.product.name }} (Spare Part)</td>
+                        <td>{{ part.quantity }}</td>
+                        <td>KSh {{ part.product.price|floatformat:2 }}</td>
+                        <td class="amount">KSh {% widthratio part.product.price 1 part.quantity %}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Section -->
+        <div class="total-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>KSh {{ subtotal|floatformat:2 }}</span>
+            </div>
+            <div class="total-row">
+                <span>Service Fee:</span>
+                <span>KSh {{ service_fee|floatformat:2 }}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total Amount Due:</span>
+                <span>KSh {{ total_amount|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+            <h3>Payment Information</h3>
+            <p>Please complete your payment using any of the following methods:</p>
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <strong>M-PESA:</strong> Pay to +254 711962088 (Business Number: 123456)
+                </div>
+                <div class="payment-method">
+                    <strong>Bank Transfer:</strong> Account Name: Randini Auto Garage, Account: 0123456789, Bank: Equity Bank
+                </div>
+                <div class="payment-method">
+                    <strong>Cash:</strong> Visit our garage in Bungoma for cash payment
+                </div>
+            </div>
+            <p><strong>Payment Due:</strong> Within 7 days of service completion</p>
+        </div>
+
+        <!-- Thank You Message -->
+        <div class="thank-you">
+            Thank you for choosing Randini Auto Garage! Your vehicle has been serviced and is ready for collection.
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Randini Auto Garage</strong></p>
+            <p>Bungoma, Kenya | +254 711962088 | randinigarage@gmail.com</p>
+            <p>This is an automated invoice. Please contact us if you have any questions.</p>
+        </div>
+    </div>
+</body>
+</html>

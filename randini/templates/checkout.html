@@ -4,46 +4,45 @@
 {% block title %}Checkout | Randini Auto Garage{% endblock %}
 
 {% block content %}
-<section class="py-5">
+<section class="py-5 bg-light">
     <div class="container">
-        <h1 class="fw-bold text-center mb-4">Checkout</h1>
-        <p class="text-center text-muted mb-5">Complete your order by filling in your details</p>
-
+        <h2 class="fw-bold text-center mb-4">Complete Your Order</h2>
+        
         <div class="row g-4">
             <div class="col-lg-7">
-                <div class="card shadow p-4 border-0">
-                    <h4 class="fw-bold mb-4" style="color: var(--maroon);">Billing Details</h4>
+                <div class="card shadow-sm border-0 p-4">
+                    <h4 class="fw-bold mb-4" style="color: #800000;">Shipping & Payment</h4>
+                    
                     <form method="POST" action="{% url 'checkout' %}" id="checkoutForm">
                         {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Full Name</label>
-                                <input type="text" name="full_name" class="form-control" placeholder="John Doe" required>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">FULL NAME</label>
+                                <input type="text" name="full_name" class="form-control" placeholder="Trizah Example" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="example@gmail.com" required>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">EMAIL ADDRESS</label>
+                                <input type="email" name="email" class="form-control" placeholder="trizah@example.com" required>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Phone Number (M-Pesa)</label>
-                            <input type="tel" name="phone" id="phoneInput" class="form-control" placeholder="0711962088" required>
-                            <small class="text-muted">Enter the Safaricom number for the STK push prompt.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Delivery Address</label>
-                            <textarea name="address" class="form-control" rows="2" placeholder="e.g. Apartment, Street, House No." required></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">City</label>
-                                <input type="text" name="city" class="form-control" placeholder="Bungoma" required>
+                            <div class="col-12">
+                                <label class="form-label fw-bold small">M-PESA PHONE NUMBER</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">+254</span>
+                                    <input type="tel" name="phone" id="phoneInput" class="form-control" placeholder="712345678" required>
+                                </div>
+                                <small class="text-muted">Enter the number that will receive the M-Pesa PIN prompt.</small>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Payment Method</label>
+                            <div class="col-12">
+                                <label class="form-label fw-bold small">DELIVERY ADDRESS</label>
+                                <textarea name="address" class="form-control" rows="2" placeholder="Street, Apartment, House No." required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">CITY</label>
+                                <input type="text" name="city" class="form-control" placeholder="Nairobi" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">PAYMENT METHOD</label>
                                 <select name="payment_method" id="paymentMethod" class="form-select">
                                     <option value="mpesa" selected>M-Pesa (STK Push)</option>
                                     <option value="cash">Cash on Delivery</option>
@@ -51,8 +50,8 @@
                             </div>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="btn btn-warning fw-bold w-100 mt-3 py-3">
-                            <span id="btnText">Pay with M-Pesa</span>
+                        <button type="submit" id="submitBtn" class="btn btn-warning w-100 mt-4 py-3 fw-bold shadow-sm">
+                            <span id="btnText">Confirm Order & Pay</span>
                             <div id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></div>
                         </button>
                     </form>
@@ -60,41 +59,31 @@
             </div>
 
             <div class="col-lg-5">
-                <div class="card shadow p-4 border-0 bg-light">
-                    <h4 class="fw-bold mb-4">Order Summary</h4>
+                <div class="card shadow-sm border-0 p-4 bg-white">
+                    <h4 class="fw-bold mb-3">Order Summary</h4>
                     <div class="table-responsive">
-                        <table class="table table-borderless">
+                        <table class="table">
                             <tbody>
                                 {% for item in cart_items %}
                                 <tr>
                                     <td>
-                                        <span class="fw-bold text-dark">{{ item.part.name }}</span>
-                                        <br><small class="text-muted">Qty: {{ item.quantity }}</small>
+                                        <div class="fw-bold">{{ item.name }}</div>
+                                        <small class="text-muted">Qty: {{ item.quantity }}</small>
                                     </td>
                                     <td class="text-end">KSh {{ item.total }}</td>
                                 </tr>
-                                {% empty %}
-                                <tr><td colspan="2" class="text-center text-muted">Your cart is empty</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-
                     <hr>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal</span>
                         <span>KSh {{ subtotal }}</span>
                     </div>
-                    
-                    <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
+                    <div class="d-flex justify-content-between fw-bold fs-4 mt-2" style="color: #800000;">
                         <span>Total</span>
-                        <span style="color: #800000;">KSh {{ total }}</span>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <a href="{% url 'cart' %}" class="btn btn-outline-secondary w-100">
-                            <i class="bi bi-arrow-left me-2"></i>Edit Cart
-                        </a>
+                        <span>KSh {{ total }}</span>
                     </div>
                 </div>
             </div>
@@ -102,38 +91,46 @@
     </div>
 </section>
 
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.15);
+    }
+</style>
+
 <script>
-    const paymentMethod = document.getElementById('paymentMethod');
-    const submitBtn = document.getElementById('submitBtn');
-    const btnText = document.getElementById('btnText');
-    const btnSpinner = document.getElementById('btnSpinner');
-    const phoneInput = document.getElementById('phoneInput');
-    const checkoutForm = document.getElementById('checkoutForm');
+    // Using window.onload to avoid "null" errors in the console
+    window.onload = function() {
+        console.log("Randini Checkout Loaded Successfully");
 
-    // Toggle button text based on selection
-    paymentMethod.addEventListener('change', function() {
-        if (this.value === 'mpesa') {
-            btnText.innerHTML = 'Pay with M-Pesa';
-            phoneInput.placeholder = '0711XXXXXX';
-        } else {
-            btnText.innerHTML = 'Place Order (Cash)';
-            phoneInput.placeholder = 'Phone for delivery';
-        }
-    });
+        const checkoutForm = document.getElementById('checkoutForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const paymentMethod = document.getElementById('paymentMethod');
 
-    // Loading Spinner Logic on Submit
-    checkoutForm.addEventListener('submit', function(e) {
-        // Only show spinner if the form is valid (native HTML5 check)
-        if (checkoutForm.checkValidity()) {
-            submitBtn.disabled = true;
-            btnSpinner.classList.remove('d-none');
-            
-            if (paymentMethod.value === 'mpesa') {
-                btnText.innerHTML = 'Sending STK Push...';
-            } else {
-                btnText.innerHTML = 'Processing Order...';
-            }
+        if (checkoutForm) {
+            // Update button text when payment method changes
+            paymentMethod.addEventListener('change', function() {
+                btnText.innerHTML = (this.value === 'mpesa') ? 'Confirm Order & Pay' : 'Place Order (Cash)';
+            });
+
+            // Prevent multiple submissions and show feedback
+            checkoutForm.onsubmit = function() {
+                if (checkoutForm.checkValidity()) {
+                    console.log("Submitting form...");
+                    
+                    // Tiny delay so the POST request starts before the button disables
+                    setTimeout(() => {
+                        submitBtn.disabled = true;
+                        btnSpinner.classList.remove('d-none');
+                        btnText.innerHTML = (paymentMethod.value === 'mpesa') ? "Sending STK Push..." : "Processing Order...";
+                    }, 50);
+                    
+                    return true;
+                }
+            };
         }
-    });
+    };
 </script>
 {% endblock %}

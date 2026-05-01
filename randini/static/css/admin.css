@@ -307,3 +307,26 @@ body {
         flex-direction: column;
         justify-content: center;
     }
+/* ── Additions for updated portal ── */
+:root {
+  --maroon: #800000;
+  --maroon-dark: #600000;
+  --gold: #ffc107;
+}
+.ms-sidebar { margin-left: 260px; }
+.bg-maroon { background-color: var(--maroon) !important; }
+.text-maroon { color: var(--maroon) !important; }
+.border-maroon { border-color: var(--maroon) !important; }
+.btn-outline-maroon {
+  border: 1.5px solid var(--maroon);
+  color: var(--maroon);
+}
+.btn-outline-maroon:hover {
+  background: var(--maroon);
+  color: #fff;
+}
+/* Form control maroon focus */
+.form-control:focus, .form-select:focus {
+  border-color: var(--maroon);
+  box-shadow: 0 0 0 3px rgba(128,0,0,.1);
+}

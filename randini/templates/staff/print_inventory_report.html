@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Report - {{ garage_info.name }}</title>
+    <style>
+        @media print {
+            body { font-size: 10px; }
+            .no-print { display: none !important; }
+            .report-container { 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 15px; 
+                box-shadow: none;
+            }
+            th, td { font-size: 9px; padding: 4px; }
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .report-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header { text-align: center; border-bottom: 2px solid #800000; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { color: #800000; margin: 0; font-size: 28px; }
+        .header p { margin: 5px 0; color: #666; }
+        .report-summary { display: flex; justify-content: space-around; margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .summary-item { text-align: center; }
+        .summary-number { font-size: 24px; font-weight: bold; color: #800000; }
+        .summary-label { color: #666; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { background: #800000; color: white; text-align: left; padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+        .stock-normal { color: #28a745; font-weight: bold; }
+        .stock-low { color: #ffc107; font-weight: bold; }
+        .stock-out { color: #dc3545; font-weight: bold; }
+        .no-print { text-align: center; margin: 20px 0; }
+        .btn-print { background: #800000; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-print:hover { background: #600000; }
+        .alert-section { margin-bottom: 20px; }
+        .alert-box { padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .alert-low { background: #fff3cd; border-left: 4px solid #ffc107; }
+        .alert-out { background: #f8d7da; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>{{ garage_info.name }}</h1>
+            <p>{{ garage_info.address }}</p>
+            <p>{{ garage_info.phone }}</p>
+            <p>{{ garage_info.email }}</p>
+        </div>
+
+        <h2 style="text-align: center; color: #800000; margin-bottom: 20px;">INVENTORY REPORT</h2>
+
+        <div class="report-summary">
+            <div class="summary-item">
+                <div class="summary-number">{{ total_parts }}</div>
+                <div class="summary-label">Total Parts</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">{{ low_stock_parts|length }}</div>
+                <div class="summary-label">Low Stock (≤5)</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">{{ out_of_stock_parts|length }}</div>
+                <div class="summary-label">Out of Stock</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">KSh {{ total_value|floatformat:0 }}</div>
+                <div class="summary-label">Total Value</div>
+            </div>
+        </div>
+
+        {% if out_of_stock_parts %}
+        <div class="alert-section">
+            <div class="alert-box alert-out">
+                <h4 style="color: #721c24; margin: 0 0 10px 0;">⚠️ OUT OF STOCK ALERT</h4>
+                <p style="margin: 0;">The following parts are completely out of stock and need immediate attention:</p>
+                <ul style="margin: 10px 0 0 20px;">
+                    {% for part in out_of_stock_parts %}
+                    <li>{{ part.name }} (Current: 0)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if low_stock_parts %}
+        <div class="alert-section">
+            <div class="alert-box alert-low">
+                <h4 style="color: #856404; margin: 0 0 10px 0;">⚠️ LOW STOCK WARNING</h4>
+                <p style="margin: 0;">The following parts have low stock levels (≤5 items):</p>
+                <ul style="margin: 10px 0 0 20px;">
+                    {% for part in low_stock_parts %}
+                    <li>{{ part.name }} (Current: {{ part.stock }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Part Name</th>
+                    <th>Price</th>
+                    <th>Current Stock</th>
+                    <th>Total Value</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for part in parts %}
+                <tr>
+                    <td>
+                        {% if part.image %}
+                            <img src="{{ part.image.url }}" alt="{{ part.name }}" style="max-width:50px; max-height:50px;">
+                        {% else %}
+                            <span style="color:#999;">No Image</span>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ part.name }}</strong></td>
+                    <td>KSh {{ part.price }}</td>
+                    <td>
+                        {% if part.stock == 0 %}
+                            <span class="stock-out">{{ part.stock }}</span>
+                        {% elif part.stock <= 5 %}
+                            <span class="stock-low">{{ part.stock }}</span>
+                        {% else %}
+                            <span class="stock-normal">{{ part.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td>KSh {% widthratio part.price 1 part.stock %}</td>
+                    <td>
+                        {% if part.stock == 0 %}
+                            <span class="stock-out">OUT OF STOCK</span>
+                        {% elif part.stock <= 5 %}
+                            <span class="stock-low">LOW STOCK</span>
+                        {% else %}
+                            <span class="stock-normal">IN STOCK</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px;">No parts found in inventory.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 40px; color: #666; font-size: 12px;">
+            <p><strong>Report generated on:</strong> {% now "d F, Y H:i" %}</p>
+            <p>This is an official inventory report from {{ garage_info.name }}</p>
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">Print Report</button>
+        <br><br>
+        <a href="{% url 'staff_dashboard' %}" style="color: #800000; text-decoration: none;">Back to Dashboard</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Auto-print dialog
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>
